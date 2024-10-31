@@ -1,10 +1,10 @@
-// pages/home.tsx
-
+// src/pages/home.tsx
 "use client";
 import { Layout } from "antd";
 import { Content } from "antd/es/layout/layout";
 import ShortVideo from "@/components/shortVideo";
 import { useEffect, useRef, useState } from "react";
+import { useTheme } from "@/untils/ThemeContext";
 
 const videos = [
   {
@@ -37,6 +37,7 @@ const videos = [
 ];
 
 const HomePage: React.FC = () => {
+  const { theme } = useTheme();
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const videoContainerRef = useRef<HTMLDivElement>(null);
 
@@ -64,23 +65,23 @@ const HomePage: React.FC = () => {
         videoContainer.removeEventListener("scroll", handleScroll);
       }
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentVideoIndex]);
 
   return (
-    <Layout>
+    <Layout style={{ background: theme === "dark" ? "#121212" : "#ffffff" }}>
       <Content
         ref={videoContainerRef}
         style={{
-          height: "100vh", // Full height viewport for vertical scroll
-          overflowY: "scroll", // Vertical scrolling
-          scrollSnapType: "y mandatory", // Snap to each video section
-          scrollbarWidth: "none", // Hide scrollbar for Firefox
-          msOverflowStyle: "none", // Hide scrollbar for IE and Edge
+          height: "100vh",
+          overflowY: "scroll",
+          scrollSnapType: "y mandatory",
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+          background: theme === "dark" ? "#121212" : "#ffffff",
+          color: theme === "dark" ? "#ffffff" : "#000000",
         }}
       >
         <style jsx global>{`
-          /* Hide scrollbar for WebKit browsers (Chrome, Safari) */
           .ant-layout-content::-webkit-scrollbar {
             display: none;
           }
@@ -89,11 +90,11 @@ const HomePage: React.FC = () => {
           <div
             key={index}
             style={{
-              height: "100vh", // Full height for each video
+              height: "100vh",
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              scrollSnapAlign: "start", // Align each video section
+              scrollSnapAlign: "start",
             }}
           >
             <ShortVideo
@@ -101,7 +102,7 @@ const HomePage: React.FC = () => {
               poster={video.poster}
               alt={video.alt}
               videoInfo={video.videoInfo}
-              autoPlay={index === currentVideoIndex} // Play only if current video
+              autoPlay={index === currentVideoIndex}
             />
           </div>
         ))}

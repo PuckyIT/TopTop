@@ -1,3 +1,21 @@
+:root {
+  /* Light mode colors */
+  --background-color: #ffffff;
+  --text-color: #333333;
+  --primary-color: #ff204e;
+  --secondary-color: #f5f5f5;
+  --gradient-background: linear-gradient(135deg, #f8f8ff, #e9efff);
+}
+
+[data-theme="dark"] {
+  /* Dark mode colors */
+  --background-color: #121212;
+  --text-color: #f5f5f5;
+  --primary-color: #ff204e;
+  --secondary-color: #333333;
+  --gradient-background: linear-gradient(135deg, #1e1e1e, #121212);
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -5,12 +23,56 @@
 }
 
 body {
-  background-color: rgb(248, 248, 255);
-  font-family: "Poppins", sans-serif !important;
-  font-weight: 600 !important;
+  background: var(--gradient-background);
+  color: var(--text-color);
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
 }
 
-/* ShortVideo.module.css */
+/* Ant Design Component Overrides */
+.ant-menu-item-selected {
+  background-color: transparent !important; /* Remove background color */
+}
+
+.ant-menu-item-selected span {
+  color: var(--primary-color) !important; /* Selected text color */
+}
+
+.ant-btn-primary {
+  background-color: rgba(
+    255,
+    32,
+    78,
+    0.85
+  ) !important; /* Softer primary color */
+  border-color: rgba(255, 32, 78, 0.85) !important;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.ant-btn-primary:hover {
+  background-color: var(--primary-color) !important; /* Highlight on hover */
+  border-color: var(--primary-color) !important;
+}
+
+.ant-btn-default {
+  color: var(--text-color) !important;
+  transition: color 0.3s ease, border-color 0.3s ease;
+}
+
+.ant-btn-default:hover {
+  color: var(--text-color) !important;
+  border-color: rgba(98, 98, 98, 0.5) !important;
+}
+
+.custom-btn {
+  border-color: var(--primary-color) !important;
+  color: var(--primary-color) !important;
+  background-color: transparent !important;
+}
+
+/* Custom Component Styles */
+
+/* ShortVideo.module.css adjustments */
 .video-container {
   position: relative;
   width: 100%;
@@ -40,30 +102,48 @@ body {
   opacity: 1;
 }
 
+#sidebar {
+  width: 256px;
+  position: fixed;
+  height: 100%;
+  z-index: 9;
+  background-color: var(--background-color);
+  margin-top: 5%;
+}
+
+#sidebar-menu {
+  height: 100%;
+  border-right: 0;
+  padding-top: 10%;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  background-color: var(--background-color);
+  border: none;
+  margin-left: 5%;
+}
+
+/* Custom styles for sidebar items */
+.sidebar-menu-item {
+  color: var(--text-color) !important;
+}
+
+.sidebar-menu-item:hover {
+  color: var(--primary-color) !important;
+}
+
+/* Ensure selected item color */
 .ant-menu-item-selected {
-  background-color: transparent !important; /* Remove background color */
+  background-color: transparent !important;
+  color: var(--primary-color) !important;
 }
 
-.ant-menu-item-selected span {
-  color: #ff204e !important; /* Apply selected color to text */
+.dark-placeholder ::placeholder {
+  color: #bbbbbb !important; /* Lighter color for dark mode */
+  opacity: 1 !important; /* Ensures full color display */
 }
 
-.ant-btn-primary {
-  background-color: #ff204dd8 !important; /* Màu xám nhạt hơn khi hover */
-  border-color: #ff204dd8 !important;
-  transition: background-color 0.3s ease, border-color 0.3s ease;
-}
-
-.ant-btn-primary:hover {
-  background-color: #ff204e !important; /* Màu xám nhạt hơn khi hover */
-  border-color: #ff204e !important;
-}
-
-.ant-btn-default {
-  transition: color 0.3s ease, border-color 0.3s ease;
-}
-
-.ant-btn-default:hover {
-  color: #333 !important; /* Màu xám nhạt hơn khi hover */
-  border-color: rgba(98, 98, 98, 0.5) !important;
+.light-placeholder ::placeholder {
+  color: #b0b0b0 !important; /* Original color for light mode */
+  opacity: 1 !important;
 }

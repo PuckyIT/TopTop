@@ -5,6 +5,7 @@ import { Inter } from "next/font/google";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import "@/app/globals.css";
 import ClientOnlyLayout from "@/components/clientOnlyLayout";
+import { ThemeProvider } from "@/untils/ThemeContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,11 +16,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <AntdRegistry>
-          <ClientOnlyLayout>{children}</ClientOnlyLayout>
-        </AntdRegistry>
-      </body>
+      <ThemeProvider>
+        <body className={inter.className}>
+          <AntdRegistry>
+            <ClientOnlyLayout>{children}</ClientOnlyLayout>
+          </AntdRegistry>
+        </body>
+      </ThemeProvider>
     </html>
   );
 }

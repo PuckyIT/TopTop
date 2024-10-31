@@ -3,7 +3,7 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:8080/api/v1',
+  baseURL: 'https://toptop-be.onrender.com/api/v1',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -16,7 +16,7 @@ axiosInstance.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    console.log("Interceptor config:", config);  // Log config để xem header Authorization
+    console.log("Interceptor config:", config); 
     return config;
   },
   (error) => {

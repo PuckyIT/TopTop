@@ -1,10 +1,18 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { Layout, Input, Button, Avatar } from "antd";
+import { Layout, Input, Button, Avatar, Dropdown, Menu } from "antd";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { SearchOutlined } from "@ant-design/icons";
+import { useTheme } from "@/untils/ThemeContext";
+import {
+  SearchOutlined,
+  MoreOutlined,
+  HomeOutlined,
+  QuestionCircleOutlined,
+  TranslationOutlined,
+  MoonOutlined,
+} from "@ant-design/icons";
 
 const { Header } = Layout;
 
@@ -12,13 +20,13 @@ const HeaderComponent: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const { theme, toggleTheme } = useTheme();
 
-  // Fetch user info from localStorage when the component mounts
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
-      setUser(JSON.parse(storedUser)); // Convert from string to object
-      setIsLoggedIn(true); // Set login status to true
+      setUser(JSON.parse(storedUser));
+      setIsLoggedIn(true);
     }
   }, []);
 
@@ -26,7 +34,7 @@ const HeaderComponent: React.FC = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setIsLoggedIn(false);
-    setUser(null); // Set user to null on logout
+    setUser(null);
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,10 +50,64 @@ const HeaderComponent: React.FC = () => {
         .toUpperCase()
     : "U";
 
+  const menu = (
+    <Menu
+      style={{
+        backgroundColor: theme === "dark" ? "#333333" : "#ffffff",
+        borderRadius: "8px",
+        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+      }}
+    >
+      <Menu.Item
+        key="creator"
+        icon={<HomeOutlined />}
+        style={{
+          color: theme === "dark" ? "#f5f5f5" : "#333333",
+          padding: "8px 16px",
+        }}
+      >
+        Công cụ dành cho nhà sáng tạo
+      </Menu.Item>
+      <Menu.Item
+        key="language"
+        icon={<TranslationOutlined />}
+        style={{
+          color: theme === "dark" ? "#f5f5f5" : "#333333",
+          padding: "8px 16px",
+        }}
+      >
+        Tiếng Việt
+      </Menu.Item>
+      <Menu.Item
+        key="support"
+        icon={<QuestionCircleOutlined />}
+        style={{
+          color: theme === "dark" ? "#f5f5f5" : "#333333",
+          padding: "8px 16px",
+        }}
+      >
+        Phản hồi và trợ giúp
+      </Menu.Item>
+      <Menu.Item
+        key="theme"
+        icon={<MoonOutlined />}
+        style={{
+          color: theme === "dark" ? "#f5f5f5" : "#333333",
+          padding: "8px 16px",
+        }}
+        onClick={toggleTheme}
+      >
+        {theme === "light" ? "Chế độ tối" : "Chế độ sáng"}
+      </Menu.Item>
+    </Menu>
+  );
+
   return (
     <Header
+      className={theme === "dark" ? "dark-mode" : "light-mode"}
       style={{
-        background: "#fff",
+        background: theme === "light" ? "#ffffff" : "#121212",
+        color: theme === "light" ? "#333" : "#f5f5f5",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
@@ -54,13 +116,14 @@ const HeaderComponent: React.FC = () => {
         height: "80px",
         width: "100vw",
         zIndex: 10,
+        borderBottom: `1px solid ${theme === "light" ? "#e0e0e0" : "#444"}`,
       }}
     >
+      {/* Logo and Search */}
       <div
         style={{
           width: "15%",
           height: "80px",
-          position: "relative",
           display: "flex",
           alignItems: "center",
         }}
@@ -91,7 +154,7 @@ const HeaderComponent: React.FC = () => {
             style={{
               fontSize: "30px",
               fontWeight: "600",
-              color: "#333",
+              color: theme === "light" ? "#333" : "#f5f5f5",
               textShadow: "1px 1px 3px rgba(0, 0, 0, 0.2)",
             }}
           >
@@ -104,84 +167,108 @@ const HeaderComponent: React.FC = () => {
         placeholder="Search"
         value={searchTerm}
         onChange={handleSearchChange}
+        className={theme === "dark" ? "dark-placeholder" : "light-placeholder"}
         style={{
           width: 400,
           borderRadius: 20,
-          backgroundColor: "#f5f5f5",
+          backgroundColor: theme === "light" ? "#f5f5f5" : "#555",
+          color: theme === "light" ? "#333" : "#ffffff",
           padding: "8px 16px",
           fontSize: "16px",
-          boxShadow: "none",
           border: "1px solid #e0e0e0",
         }}
         suffix={
           <SearchOutlined
             style={{
-              color: "#b0b0b0",
+              color: theme === "light" ? "#b0b0b0" : "#aaa",
               fontSize: "16px",
               cursor: "pointer",
               padding: 5,
-              transition: "color 0.3s", // Smooth transition
+              transition: "color 0.3s",
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "#FF204E")} // Hover color
-            onMouseLeave={(e) => (e.currentTarget.style.color = "#b0b0b0")} // Original color
+            onMouseEnter={(e) => (e.currentTarget.style.color = "#FF204E")}
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.color =
+                theme === "light" ? "#b0b0b0" : "#aaa")
+            }
           />
         }
       />
 
-      {isLoggedIn ? (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            height: "50%",
-            marginRight: 30,
-          }}
-        >
-          <Link href="/profile">
-            <Avatar
-              src={user?.avatar || undefined} // Get avatar from localStorage
-              alt="User Avatar"
+      {/* Log In and Dropdown */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: "10%",
+        }}
+      >
+        {isLoggedIn ? (
+          <div
+            style={{ display: "flex", alignItems: "center", marginRight: 30 }}
+          >
+            <Link href="/profile">
+              <Avatar
+                src={user?.avatar || undefined}
+                alt="User Avatar"
+                style={{
+                  backgroundColor: "#ff204e",
+                  borderColor: "transparent",
+                  marginRight: 20,
+                  fontWeight: "bold",
+                  height: "39px",
+                  width: "39px",
+                  cursor: "pointer",
+                }}
+              >
+                {!user?.avatar && userInitials}
+              </Avatar>
+            </Link>
+            <Button
+              type="default"
+              className="custom-btn"
               style={{
-                backgroundColor: "#ff204e",
-                borderColor: "rgb(248, 248, 255)",
-                marginRight: 20,
                 fontWeight: "bold",
-                height: "39px",
-                width: "39px",
-                cursor: "pointer",
+                fontFamily: "'Poppins', sans-serif",
+                height: "100%",
+              }}
+              onClick={handleLogout}
+            >
+              Log Out
+            </Button>
+          </div>
+        ) : (
+          <Link href="/login">
+            <Button
+              type="primary"
+              style={{
+                height: "40px",
+                fontFamily: "'Poppins', sans-serif",
+                fontWeight: "600",
               }}
             >
-              {!user?.avatar && userInitials}
-              {""}
-              {/* Display initials if no avatar */}
-            </Avatar>
+              Log in
+            </Button>
           </Link>
-          <Button
-            type="default"
+        )}
+        <Dropdown
+          overlay={menu}
+          trigger={["hover"]}
+          overlayStyle={{
+            marginTop: "10px",
+            borderRadius: "8px",
+          }}
+        >
+          <MoreOutlined
             style={{
-              fontWeight: "bold",
-              height: "100%",
+              fontSize: "24px",
+              cursor: "pointer",
+              color: theme === "light" ? "#333333" : "#f5f5f5",
             }}
-            onClick={handleLogout}
-          >
-            Log Out
-          </Button>
-        </div>
-      ) : (
-        <Link href="/login">
-          <Button
-            type="primary"
-            style={{
-              height: "40px",
-              fontFamily: "'Poppins', sans-serif",
-              fontWeight: "600",
-              marginRight: 30,
-            }}
-          >
-            Log In
-          </Button>
-        </Link>
-      )}
+          />
+        </Dropdown>
+      </div>
     </Header>
   );
 };

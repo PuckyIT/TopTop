@@ -16,22 +16,21 @@ const Sidebar = () => {
 
   const handleMenuClick = (key: string) => {
     setSelectedKey(key);
-    // Navigate to the corresponding page when a menu item is clicked
     switch (key) {
       case "1":
-        router.push("/home"); // For You
+        router.push("/home");
         break;
       case "2":
-        router.push("/explore"); // Explore
+        router.push("/explore");
         break;
       case "3":
-        router.push("/following"); // Following
+        router.push("/following");
         break;
       case "4":
-        router.push("/live"); // LIVE
+        router.push("/live");
         break;
       case "5":
-        router.push("/profile"); // Profile
+        router.push("/profile");
         break;
       default:
         break;
@@ -67,27 +66,16 @@ const Sidebar = () => {
   ];
 
   return (
-    <div
-      style={{
-        width: 256,
-        position: "fixed",
-        height: "100%",
-        zIndex: 9,
-      }}
-    >
+    <div id="sidebar">
       <Menu
-        mode="inline"
+        mode="vertical"
         selectedKeys={[selectedKey]}
-        style={{
-          height: "100%",
-          borderRight: 0,
-          paddingTop: "40%",
-          fontFamily: "'Poppins', sans-serif",
-          fontWeight: "600",
-          fontSize: "16px",
-        }}
+        id="sidebar-menu"
         onClick={({ key }) => handleMenuClick(key)}
-        items={menuItems}
+        items={menuItems.map((item) => ({
+          ...item,
+          className: "sidebar-menu-item",
+        }))}
       />
     </div>
   );

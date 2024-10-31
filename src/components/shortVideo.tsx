@@ -69,7 +69,8 @@ const ShortVideo: React.FC<ShortVideoProps> = ({
 
   const handleSeek = (event: React.MouseEvent<HTMLDivElement>) => {
     if (videoRef.current && duration) {
-      const clickX = event.clientX - event.currentTarget.getBoundingClientRect().left;
+      const clickX =
+        event.clientX - event.currentTarget.getBoundingClientRect().left;
       const newTime = (clickX / event.currentTarget.clientWidth) * duration;
       videoRef.current.currentTime = newTime;
       setCurrentTime(newTime);
@@ -78,8 +79,12 @@ const ShortVideo: React.FC<ShortVideoProps> = ({
 
   const handleVolumeChange = (event: React.MouseEvent<HTMLDivElement>) => {
     if (videoRef.current) {
-      const clickY = event.clientY - event.currentTarget.getBoundingClientRect().top;
-      const newVolume = Math.min(1, Math.max(0, 1 - clickY / event.currentTarget.clientHeight));
+      const clickY =
+        event.clientY - event.currentTarget.getBoundingClientRect().top;
+      const newVolume = Math.min(
+        1,
+        Math.max(0, 1 - clickY / event.currentTarget.clientHeight)
+      );
       videoRef.current.volume = newVolume;
       setVolume(newVolume);
       setIsMuted(newVolume === 0);
@@ -110,7 +115,11 @@ const ShortVideo: React.FC<ShortVideoProps> = ({
   return (
     <div
       className="video-container"
-      style={{ height: "95vh", position: "relative", overflow: "hidden" }}
+      style={{
+        height: "95vh",
+        position: "relative",
+        overflow: "hidden",
+      }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -165,7 +174,13 @@ const ShortVideo: React.FC<ShortVideoProps> = ({
             fontSize: "20px",
             padding: 3,
           }}
-          icon={isPlaying ? <FontAwesomeIcon icon={faPause} /> : <FontAwesomeIcon icon={faPlay} />}
+          icon={
+            isPlaying ? (
+              <FontAwesomeIcon icon={faPause} />
+            ) : (
+              <FontAwesomeIcon icon={faPlay} />
+            )
+          }
           onClick={handlePlayPause}
         />
 

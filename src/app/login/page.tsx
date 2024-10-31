@@ -76,7 +76,7 @@ const LoginPage: React.FC = () => {
   };
 
   const handleGoogleLogin = async () => {
-    window.location.href = "http://localhost:8080/api/v1/auth/google";
+    window.location.href = "https://toptop-be.onrender.com/api/v1/auth/google";
   };
 
   return (
@@ -236,7 +236,7 @@ const LoginPage: React.FC = () => {
               }}
               onClick={() => {
                 window.location.href =
-                  "http://localhost:8080/api/v1/auth/github";
+                  "https://toptop-be.onrender.com/api/v1/auth/github";
               }}
             >
               <Image
