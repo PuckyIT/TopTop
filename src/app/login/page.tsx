@@ -219,7 +219,6 @@ const LoginPage: React.FC = () => {
                 width={20}
                 height={20}
               />
-              Google
             </Button>
 
             <Button
@@ -245,7 +244,6 @@ const LoginPage: React.FC = () => {
                 width={20}
                 height={20}
               />
-              GitHub
             </Button>
           </div>
         </Form.Item>
