@@ -212,9 +212,9 @@ const HeaderComponent: React.FC = () => {
               <Avatar
                 src={user?.avatar || undefined}
                 alt="User Avatar"
+                className="avatar-user"
                 style={{
                   backgroundColor: "#ff204e",
-                  borderColor: "transparent",
                   marginRight: 20,
                   fontWeight: "bold",
                   height: "39px",

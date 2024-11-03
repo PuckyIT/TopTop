@@ -5,8 +5,6 @@ import { useState } from "react";
 import { Form, Input, Button, message, Modal } from "antd";
 import { useRouter } from "next/navigation";
 import axiosInstance from "@/untils/axiosInstance";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGoogle, faGithub } from "@fortawesome/free-brands-svg-icons";
 import Link from "next/link";
 import Image from "next/image";
 

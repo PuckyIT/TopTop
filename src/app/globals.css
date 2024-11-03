@@ -147,3 +147,7 @@ body {
   color: #b0b0b0 !important; /* Original color for light mode */
   opacity: 1 !important;
 }
+
+.avatar-user{
+  border: transparent !important;
+}
