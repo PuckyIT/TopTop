@@ -7,6 +7,7 @@ import Image from "next/image";
 
 const Signup: React.FC = () => {
   const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -22,10 +23,10 @@ const Signup: React.FC = () => {
     try {
       const response = await axiosInstance.post("/users/signup", {
         email,
+        username,
         password,
       });
       message.success("Registration successful!");
-      localStorage.setItem("token", response.data.access_token);
       router.push("/login");
     } catch (error) {
       message.error("Registration failed!");
@@ -81,6 +82,19 @@ const Signup: React.FC = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Your Email"
+          />
+        </Form.Item>
+
+        <Form.Item
+          label="Username"
+          name="username"
+          rules={[{ required: true, message: "Please enter your Username!" }]}
+        >
+          <Input
+            type="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Your Username"
           />
         </Form.Item>
 

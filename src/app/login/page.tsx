@@ -24,7 +24,7 @@ const LoginPage: React.FC = () => {
     try {
       const response = await axiosInstance.post("/auth/login", values);
       message.success("Đăng nhập thành công!");
-      localStorage.setItem("token", JSON.stringify(response.data.access_token));
+      localStorage.setItem("token", response.data.access_token);
       localStorage.setItem("user", JSON.stringify(response.data.user));
       setLoading(false);
       router.push("/home");

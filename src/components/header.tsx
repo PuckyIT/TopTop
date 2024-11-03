@@ -112,7 +112,7 @@ const HeaderComponent: React.FC = () => {
         alignItems: "center",
         justifyContent: "space-between",
         padding: "0 20px",
-        position: "fixed",
+        position: "absolute",
         height: "80px",
         width: "100vw",
         zIndex: 10,
