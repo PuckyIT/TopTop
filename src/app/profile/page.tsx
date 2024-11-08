@@ -63,6 +63,7 @@ const ProfilePage: React.FC = () => {
         message.error("Failed to load profile");
         setLoading(false);
       });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const showModal = () => {

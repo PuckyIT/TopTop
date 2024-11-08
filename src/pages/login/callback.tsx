@@ -35,7 +35,7 @@ const LoginCallback = () => {
         alignItems: "center",
         minHeight: "100vh",
         backgroundColor: theme === "dark" ? "#121212" : "#ffffff",
-        color: theme === "dark" ? "#ffffff" : "#000000", 
+        color: theme === "dark" ? "#ffffff" : "#000000",
         flexDirection: "column",
       }}
     >

@@ -21,6 +21,9 @@ const LoginPage: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const router = useRouter();
   const { theme } = useTheme();
+  const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [resetPasswordLoading, setResetPasswordLoading] = useState(false);
 
   const themeColors = {
     background: theme === "dark" ? "#333333" : "#ffffff",
@@ -49,6 +52,7 @@ const LoginPage: React.FC = () => {
   };
 
   const handleForgotPassword = async () => {
+    setForgotPasswordLoading(true);
     try {
       await axiosInstance.post("/users/forgot-password", {
         email: forgotEmail,
@@ -58,16 +62,24 @@ const LoginPage: React.FC = () => {
       setOtpModal(true);
     } catch (error) {
       message.error("Không thể gửi OTP. Vui lòng thử lại.");
+    } finally {
+      setForgotPasswordLoading(false);
     }
   };
 
   const handleVerifyOtp = () => {
-    message.success("OTP đã nhập!");
-    setOtpModal(false);
-    setResetPasswordModal(true);
+    setOtpLoading(true);
+    try{
+      message.success("OTP đã nhập!");
+      setOtpModal(false);
+      setResetPasswordModal(true);
+    } finally {
+      setOtpLoading(false);
+    }
   };
 
   const handleResetPassword = async () => {
+    setResetPasswordLoading(true);
     if (newPassword !== confirmPassword) {
       message.error("Mật khẩu xác nhận không khớp!");
       return;
@@ -84,6 +96,8 @@ const LoginPage: React.FC = () => {
       setConfirmPassword("");
     } catch (error) {
       message.error("Không thể đặt lại mật khẩu. Vui lòng thử lại.");
+    } finally {
+      setResetPasswordLoading(false);
     }
   };
 
@@ -301,6 +315,7 @@ const LoginPage: React.FC = () => {
         open={forgotPasswordModal}
         onOk={handleForgotPassword}
         onCancel={() => setForgotPasswordModal(false)}
+        confirmLoading={forgotPasswordLoading}
         okText="Xác nhận"
         cancelText="Hủy"
         style={{ top: "25%", textAlign: "center", fontWeight: "bold" }}
@@ -336,8 +351,16 @@ const LoginPage: React.FC = () => {
         onCancel={() => setOtpModal(false)}
         okText="Xác nhận"
         cancelText="Hủy"
+        confirmLoading={otpLoading}
         style={{ top: "25%", textAlign: "center", fontWeight: "bold" }}
         width={500}
+        cancelButtonProps={{
+          style: {
+            color: themeColors.color,
+            background: themeColors.inputBg,
+            border: "none",
+          },
+        }}
       >
         <Form.Item
           label="OTP"
@@ -362,8 +385,16 @@ const LoginPage: React.FC = () => {
         onCancel={() => setResetPasswordModal(false)}
         okText="Xác nhận"
         cancelText="Hủy"
+        confirmLoading={resetPasswordLoading}
         style={{ top: "25%", textAlign: "center", fontWeight: "bold" }}
         width={500}
+        cancelButtonProps={{
+          style: {
+            color: themeColors.color,
+            background: themeColors.inputBg,
+            border: "none",
+          },
+        }}
       >
         <Form layout="vertical">
           <Form.Item
