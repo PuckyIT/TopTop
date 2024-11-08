@@ -1,7 +1,15 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { Layout, Input, Button, Avatar, Dropdown, Menu } from "antd";
+import {
+  Layout,
+  Input,
+  Button,
+  Avatar,
+  Dropdown,
+  Menu,
+  Upload,
+  message,
+} from "antd";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useTheme } from "@/untils/ThemeContext";
@@ -12,7 +20,11 @@ import {
   QuestionCircleOutlined,
   TranslationOutlined,
   MoonOutlined,
+  UploadOutlined,
+  LogoutOutlined,
 } from "@ant-design/icons";
+import axiosInstance from "@/untils/axiosInstance";
+import Image from "next/image";
 
 const { Header } = Layout;
 
@@ -30,11 +42,28 @@ const HeaderComponent: React.FC = () => {
     }
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setIsLoggedIn(false);
-    setUser(null);
+  const handleLogout = async () => {
+    try {
+      await axiosInstance.post(
+        "/auth/logout",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // Include the token if necessary
+          },
+        }
+      );
+
+      // Clear the token and user info from local storage
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+
+      // Optionally redirect the user or update the UI state
+      window.location.href = "/login"; // Redirect to login page
+    } catch (error) {
+      console.error("Logout failed:", error);
+      message.error("Logout failed. Please try again.");
+    }
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -99,8 +128,42 @@ const HeaderComponent: React.FC = () => {
       >
         {theme === "light" ? "Chế độ tối" : "Chế độ sáng"}
       </Menu.Item>
+      <Menu.Item
+        key="logout"
+        icon={<LogoutOutlined />}
+        style={{
+          color: theme === "dark" ? "#f5f5f5" : "#333333",
+          padding: "8px 16px",
+        }}
+        onClick={handleLogout}
+      >
+        Log out
+      </Menu.Item>
     </Menu>
   );
+
+  const handleVideoUpload = async (file: File) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      message.error("You need to log in to upload a video.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("video", file);
+
+    try {
+      await axiosInstance.post("/videos/upload", formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      message.success("Video uploaded successfully!");
+    } catch (error) {
+      message.error("Failed to upload video.");
+    }
+  };
 
   return (
     <Header
@@ -136,12 +199,12 @@ const HeaderComponent: React.FC = () => {
             textDecoration: "none",
           }}
         >
-          <img
-            src="logo.png"
+          <Image
+            src="/logo.png"
             alt="Logo"
+            width={80}
+            height={80}
             style={{
-              width: "40%",
-              height: "100%",
               transition: "transform 0.3s",
               cursor: "pointer",
             }}
@@ -175,7 +238,6 @@ const HeaderComponent: React.FC = () => {
           color: theme === "light" ? "#333" : "#ffffff",
           padding: "8px 16px",
           fontSize: "16px",
-          border: "1px solid #e0e0e0",
         }}
         suffix={
           <SearchOutlined
@@ -205,9 +267,22 @@ const HeaderComponent: React.FC = () => {
         }}
       >
         {isLoggedIn ? (
-          <div
-            style={{ display: "flex", alignItems: "center", marginRight: 30 }}
-          >
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <Upload
+              showUploadList={false}
+              beforeUpload={(file) => {
+                handleVideoUpload(file);
+                return false; // Prevent auto upload
+              }}
+            >
+              <Button
+                type="default"
+                className="custom-btn"
+                icon={<UploadOutlined />}
+              >
+                Upload
+              </Button>
+            </Upload>
             <Link href="/profile">
               <Avatar
                 src={user?.avatar || undefined}
@@ -215,7 +290,8 @@ const HeaderComponent: React.FC = () => {
                 className="avatar-user"
                 style={{
                   backgroundColor: "#ff204e",
-                  marginRight: 20,
+                  marginLeft: 20,
+                  marginRight: 0,
                   fontWeight: "bold",
                   height: "39px",
                   width: "39px",
@@ -225,18 +301,6 @@ const HeaderComponent: React.FC = () => {
                 {!user?.avatar && userInitials}
               </Avatar>
             </Link>
-            <Button
-              type="default"
-              className="custom-btn"
-              style={{
-                fontWeight: "bold",
-                fontFamily: "'Poppins', sans-serif",
-                height: "100%",
-              }}
-              onClick={handleLogout}
-            >
-              Log Out
-            </Button>
           </div>
         ) : (
           <Link href="/login">

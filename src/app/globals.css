@@ -7,6 +7,7 @@
   --gradient-background: linear-gradient(135deg, #f8f8ff, #e9efff);
   --ink-bar-color: #000000;
   --custom-btn2: #f5f5f5;
+  --placeholder-color: #12121274;
 }
 
 [data-theme="dark"] {
@@ -18,6 +19,7 @@
   --gradient-background: linear-gradient(135deg, #1e1e1e, #121212);
   --ink-bar-color: #f5f5f5;
   --custom-btn2: #555;
+  --placeholder-color: #f5f5f574;
 }
 
 * {
@@ -61,11 +63,12 @@ body {
 .ant-btn-default {
   color: var(--text-color) !important;
   transition: color 0.3s ease, border-color 0.3s ease;
+  border-color: var(--background-color) !important;
 }
 
 .ant-btn-default:hover {
   color: var(--text-color) !important;
-  border-color: rgba(98, 98, 98, 0.5) !important;
+  border-color: var(--text-color) !important;
 }
 
 .custom-btn {
@@ -143,6 +146,11 @@ body {
   color: var(--primary-color) !important;
 }
 
+.dark-placeholder,
+.light-placeholder {
+  border: var(--background-color) !important;
+}
+
 .dark-placeholder ::placeholder {
   color: #bbbbbb !important; /* Lighter color for dark mode */
   opacity: 1 !important; /* Ensures full color display */
@@ -169,4 +177,46 @@ body {
 
 #custom-btn2 {
   background: var(--custom-btn2) !important;
+}
+
+/* Modal */
+.ant-modal {
+  background-color: var(--background-color) !important;
+  color: var(--text-color) !important;
+}
+
+.ant-modal-content {
+  background-color: var(--background-color) !important;
+}
+
+.ant-modal-header {
+  background-color: var(--background-color) !important;
+  color: var(--text-color) !important;
+}
+
+.ant-modal-title {
+  color: var(--text-color) !important;
+}
+
+.ant-modal-body {
+  background-color: var(--background-color) !important;
+  color: var(--text-color) !important;
+}
+
+.ant-modal-footer .ant-btn:hover {
+  opacity: 0.9; /* Tăng hiệu ứng hover cho nút */
+}
+/* Placeholder */
+
+::placeholder {
+  color: var(--placeholder-color) !important; 
+  opacity: 1;
+}
+
+.ant-form-item-input {
+  background-color: var(--background-color) !important;
+}
+
+.ant-form-item-label > label {
+  color: var(--text-color) !important;
 }

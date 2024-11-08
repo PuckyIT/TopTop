@@ -2,11 +2,13 @@
 
 "use client";
 import { useState } from "react";
-import { Form, Input, Button, message, Modal } from "antd";
+import { Form, Input, Button, message, Modal, theme } from "antd";
 import { useRouter } from "next/navigation";
 import axiosInstance from "@/untils/axiosInstance";
 import Link from "next/link";
 import Image from "next/image";
+import { useTheme } from "@/untils/ThemeContext";
+import { EyeInvisibleOutlined, EyeOutlined } from "@ant-design/icons";
 
 const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -18,6 +20,18 @@ const LoginPage: React.FC = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const router = useRouter();
+  const { theme } = useTheme();
+
+  const themeColors = {
+    background: theme === "dark" ? "#333333" : "#ffffff",
+    color: theme === "dark" ? "#ffffff" : "#000000",
+    inputBg: theme === "dark" ? "#555555" : "#f5f5f5",
+    inputColor: theme === "dark" ? "#ffffff" : "#333333",
+    buttonColor: theme === "dark" ? "#ff204e" : "#1890ff",
+    dividerColor: theme === "dark" ? "#666666" : "#eaeaea",
+    secondaryText:
+      theme === "dark" ? "rgba(255, 255, 255, 0.5)" : "rgba(98, 98, 98, 0.5)",
+  };
 
   const onFinish = async (values: { email: string; password: string }) => {
     setLoading(true);
@@ -84,7 +98,11 @@ const LoginPage: React.FC = () => {
         justifyContent: "center",
         alignItems: "center",
         height: "100vh",
-        background: "linear-gradient(135deg, #f8f8ff, #e9efff)",
+        background:
+          theme === "dark"
+            ? "linear-gradient(135deg, #1a1a1a, #121212)"
+            : "linear-gradient(135deg, #f8f8ff, #e9efff)",
+        color: themeColors.color,
         fontWeight: "bold",
       }}
     >
@@ -95,7 +113,8 @@ const LoginPage: React.FC = () => {
           width: 500,
           display: "flex",
           flexDirection: "column",
-          backgroundColor: "#ffffff",
+          backgroundColor: themeColors.background,
+          color: themeColors.color,
           padding: "3% 5%",
           borderRadius: "12px",
           boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
@@ -118,14 +137,34 @@ const LoginPage: React.FC = () => {
           name="email"
           rules={[{ required: true, message: "Please enter email!" }]}
         >
-          <Input type="email" placeholder="Your Email" />
+          <Input
+            type="email"
+            placeholder="Your Email"
+            style={{
+              backgroundColor: themeColors.inputBg,
+              color: themeColors.inputColor,
+            }}
+          />
         </Form.Item>
         <Form.Item
           label="Password"
           name="password"
           rules={[{ required: true, message: "Please enter password!" }]}
         >
-          <Input.Password placeholder="Your Password" />
+          <Input.Password
+            placeholder="Your Password"
+            style={{
+              backgroundColor: themeColors.inputBg,
+              color: themeColors.inputColor,
+            }}
+            iconRender={(visible) =>
+              visible ? (
+                <EyeOutlined style={{ color: themeColors.color }} />
+              ) : (
+                <EyeInvisibleOutlined style={{ color: themeColors.color }} />
+              )
+            }
+          />
         </Form.Item>
         <Form.Item>
           <Button
@@ -133,7 +172,7 @@ const LoginPage: React.FC = () => {
             style={{
               height: "3rem",
               fontWeight: "bold",
-              backgroundColor: "#ff204e",
+              backgroundColor: themeColors.buttonColor,
               border: "none",
             }}
             htmlType="submit"
@@ -180,13 +219,23 @@ const LoginPage: React.FC = () => {
             }}
           >
             <span
-              style={{ flex: 1, height: "1px", backgroundColor: "#eaeaea" }}
+              style={{
+                flex: 1,
+                height: "1px",
+                backgroundColor: themeColors.dividerColor,
+              }}
             />
-            <span style={{ padding: "0 10px", color: "rgba(98, 98, 98, 0.5)" }}>
+            <span
+              style={{ padding: "0 10px", color: themeColors.secondaryText }}
+            >
               Sign in with
             </span>
             <span
-              style={{ flex: 1, height: "1px", backgroundColor: "#eaeaea" }}
+              style={{
+                flex: 1,
+                height: "1px",
+                backgroundColor: themeColors.dividerColor,
+              }}
             />
           </div>
           <div
@@ -256,6 +305,13 @@ const LoginPage: React.FC = () => {
         cancelText="Hủy"
         style={{ top: "25%", textAlign: "center", fontWeight: "bold" }}
         width={500}
+        cancelButtonProps={{
+          style: {
+            color: themeColors.color,
+            background: themeColors.inputBg,
+            border: "none",
+          },
+        }}
       >
         <Form.Item
           label="Email"
@@ -265,6 +321,10 @@ const LoginPage: React.FC = () => {
             value={forgotEmail}
             onChange={(e) => setForgotEmail(e.target.value)}
             placeholder="Nhập email của bạn"
+            style={{
+              color: themeColors.color,
+              background: themeColors.inputBg,
+            }}
           />
         </Form.Item>
       </Modal>
@@ -287,6 +347,10 @@ const LoginPage: React.FC = () => {
             value={otp}
             onChange={(e) => setOtp(e.target.value)}
             placeholder="Nhập OTP đã gửi đến email"
+            style={{
+              color: themeColors.color,
+              background: themeColors.inputBg,
+            }}
           />
         </Form.Item>
       </Modal>
@@ -317,6 +381,17 @@ const LoginPage: React.FC = () => {
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder="Nhập mật khẩu mới"
+              style={{
+                color: themeColors.color,
+                background: themeColors.inputBg,
+              }}
+              iconRender={(visible) =>
+                visible ? (
+                  <EyeOutlined style={{ color: themeColors.color }} />
+                ) : (
+                  <EyeInvisibleOutlined style={{ color: themeColors.color }} />
+                )
+              }
             />
           </Form.Item>
           <Form.Item
@@ -334,6 +409,17 @@ const LoginPage: React.FC = () => {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Xác nhận mật khẩu mới"
+              style={{
+                color: themeColors.color,
+                background: themeColors.inputBg,
+              }}
+              iconRender={(visible) =>
+                visible ? (
+                  <EyeOutlined style={{ color: themeColors.color }} />
+                ) : (
+                  <EyeInvisibleOutlined style={{ color: themeColors.color }} />
+                )
+              }
             />
           </Form.Item>
         </Form>

@@ -1,9 +1,14 @@
+// pages/signup.tsx
+
 "use client";
 import { useState } from "react";
 import { Form, Input, Button, message } from "antd";
 import axiosInstance from "@/untils/axiosInstance";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { useTheme } from "@/untils/ThemeContext";
+import { EyeInvisibleOutlined, EyeOutlined } from "@ant-design/icons";
+import Link from "next/link";
 
 const Signup: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -12,6 +17,15 @@ const Signup: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { theme } = useTheme();
+
+  const themeColors = {
+    background: theme === "dark" ? "#333333" : "#ffffff",
+    color: theme === "dark" ? "#ffffff" : "#000000",
+    inputBg: theme === "dark" ? "#555555" : "#f5f5f5",
+    inputColor: theme === "dark" ? "#ffffff" : "#333333",
+    buttonColor: theme === "dark" ? "#ff204e" : "#1890ff",
+  };
 
   const handleSubmit = async () => {
     if (password !== confirmPassword) {
@@ -42,7 +56,11 @@ const Signup: React.FC = () => {
         justifyContent: "center",
         alignItems: "center",
         height: "100vh",
-        background: "linear-gradient(135deg, #f8f8ff, #e9efff)",
+        background:
+          theme === "dark"
+            ? "linear-gradient(135deg, #1a1a1a, #121212)"
+            : "linear-gradient(135deg, #f8f8ff, #e9efff)",
+        color: themeColors.color,
         fontWeight: "bold",
       }}
     >
@@ -53,7 +71,8 @@ const Signup: React.FC = () => {
           width: 500,
           display: "flex",
           flexDirection: "column",
-          backgroundColor: "#ffffff",
+          backgroundColor: themeColors.background,
+          color: themeColors.color,
           padding: "3% 5%",
           borderRadius: "12px",
           boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
@@ -75,50 +94,78 @@ const Signup: React.FC = () => {
         <Form.Item
           label="Email"
           name="email"
-          rules={[{ required: true, message: "Please enter your email!" }]}
+          rules={[{ required: true, message: "Please enter email!" }]}
         >
           <Input
-            type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Your Email"
+            style={{
+              backgroundColor: themeColors.inputBg,
+              color: themeColors.inputColor,
+            }}
           />
         </Form.Item>
 
         <Form.Item
           label="Username"
           name="username"
-          rules={[{ required: true, message: "Please enter your Username!" }]}
+          rules={[{ required: true, message: "Please enter username!" }]}
         >
           <Input
-            type="username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             placeholder="Your Username"
+            style={{
+              backgroundColor: themeColors.inputBg,
+              color: themeColors.inputColor,
+            }}
           />
         </Form.Item>
 
         <Form.Item
           label="Password"
           name="password"
-          rules={[{ required: true, message: "Please enter your password!" }]}
+          rules={[{ required: true, message: "Please enter password!" }]}
         >
           <Input.Password
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Your Password"
+            style={{
+              backgroundColor: themeColors.inputBg,
+              color: themeColors.inputColor,
+            }}
+            iconRender={(visible) =>
+              visible ? (
+                <EyeOutlined style={{ color: themeColors.color }} />
+              ) : (
+                <EyeInvisibleOutlined style={{ color: themeColors.color }} />
+              )
+            }
           />
         </Form.Item>
 
         <Form.Item
           label="Confirm Password"
           name="confirmPassword"
-          rules={[{ required: true, message: "Please confirm your password!" }]}
+          rules={[{ required: true, message: "Please confirm password!" }]}
         >
           <Input.Password
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="Confirm Your Password"
+            placeholder="Confirm Password"
+            style={{
+              backgroundColor: themeColors.inputBg,
+              color: themeColors.inputColor,
+            }}
+            iconRender={(visible) =>
+              visible ? (
+                <EyeOutlined style={{ color: themeColors.color }} />
+              ) : (
+                <EyeInvisibleOutlined style={{ color: themeColors.color }} />
+              )
+            }
           />
         </Form.Item>
 
@@ -128,7 +175,7 @@ const Signup: React.FC = () => {
             style={{
               height: "3rem",
               fontWeight: "bold",
-              backgroundColor: "#ff204e",
+              backgroundColor: themeColors.buttonColor,
               border: "none",
             }}
             htmlType="submit"
@@ -138,20 +185,23 @@ const Signup: React.FC = () => {
             Sign Up
           </Button>
         </Form.Item>
-
         <Form.Item>
           <div
             style={{
               display: "flex",
               justifyContent: "end",
               alignItems: "center",
-              gap: 5,
             }}
           >
-            Already have an account?
-            <Button type="link" href="/login" style={{ right: 0, padding: 0 }}>
-              Sign In
-            </Button>
+            <Link href="/login">
+              <Button
+                type="link"
+                block
+                style={{ textAlign: "left", padding: 0 }}
+              >
+                Log In
+              </Button>
+            </Link>
           </div>
         </Form.Item>
       </Form>
