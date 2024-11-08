@@ -26,7 +26,7 @@ import {
   TableOutlined,
   UploadOutlined,
 } from "@ant-design/icons";
-import { useTheme } from "@/untils/ThemeContext";
+import { useTheme } from "../context/ThemeContext";
 
 const { Title, Text } = Typography;
 
@@ -42,7 +42,7 @@ type ProfileData = {
 const ProfilePage: React.FC = () => {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const user = JSON.parse(localStorage.getItem("user") || "");
+  const [user, setUser] = useState<any>(null);
   const { theme } = useTheme();
   const [activeTab, setActiveTab] = useState("1");
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -50,6 +50,13 @@ const ProfilePage: React.FC = () => {
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [tempAvatar, setTempAvatar] = useState<string | undefined>();
   const [loadingSave, setLoadingSave] = useState(false);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);  
 
   useEffect(() => {
     axiosInstance

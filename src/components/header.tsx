@@ -12,7 +12,7 @@ import {
 } from "antd";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { useTheme } from "@/untils/ThemeContext";
+import { useTheme } from "@/app/context/ThemeContext";
 import {
   SearchOutlined,
   MoreOutlined,
@@ -41,18 +41,10 @@ const HeaderComponent: React.FC = () => {
       setIsLoggedIn(true);
     }
   }, []);
-
+  
   const handleLogout = async () => {
     try {
-      await axiosInstance.post(
-        "/auth/logout",
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`, // Include the token if necessary
-          },
-        }
-      );
+      await axiosInstance.post("/auth/logout");
 
       // Clear the token and user info from local storage
       localStorage.removeItem("token");

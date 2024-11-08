@@ -4,7 +4,7 @@
 import { usePathname } from "next/navigation";
 import HeaderComponent from "@/components/header";
 import Sidebar from "@/components/sidebar";
-import { useTheme } from "@/untils/ThemeContext";
+import { useTheme } from "@/app/context/ThemeContext";
 
 const ClientOnlyLayout: React.FC<{ children: React.ReactNode }> = ({
   children,

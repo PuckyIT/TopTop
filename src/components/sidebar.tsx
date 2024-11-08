@@ -9,10 +9,12 @@ import {
 } from "@ant-design/icons";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAbility } from "@/app/context/AbilityContext";
 
 const Sidebar = () => {
   const router = useRouter();
   const [selectedKey, setSelectedKey] = useState<string>("1");
+  const ability = useAbility();
 
   const handleMenuClick = (key: string) => {
     setSelectedKey(key);
@@ -30,7 +32,9 @@ const Sidebar = () => {
         router.push("/live");
         break;
       case "5":
-        router.push("/profile");
+        if (ability.can("read", "Profile")) {
+          router.push("/profile");
+        }
         break;
       default:
         break;
@@ -58,11 +62,15 @@ const Sidebar = () => {
       icon: <VideoCameraOutlined style={{ fontSize: "18px" }} />,
       label: "LIVE",
     },
-    {
-      key: "5",
-      icon: <UserOutlined style={{ fontSize: "18px" }} />,
-      label: "Profile",
-    },
+    ...(ability.can("read", "Profile")
+      ? [
+          {
+            key: "5",
+            icon: <UserOutlined style={{ fontSize: "18px" }} />,
+            label: "Profile",
+          },
+        ]
+      : []),
   ];
 
   return (

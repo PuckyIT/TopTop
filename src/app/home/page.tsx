@@ -1,10 +1,11 @@
-// src/pages/home.tsx
 "use client";
 import { Layout } from "antd";
 import { Content } from "antd/es/layout/layout";
 import ShortVideo from "@/components/shortVideo";
 import { useEffect, useRef, useState } from "react";
-import { useTheme } from "@/untils/ThemeContext";
+import { useTheme } from "@/app/context/ThemeContext";
+import { AbilityProvider } from "../context/AbilityProvider";
+import { useAbility } from "../context/AbilityContext";
 
 const videos = [
   {
@@ -40,6 +41,13 @@ const HomePage: React.FC = () => {
   const { theme } = useTheme();
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const videoContainerRef = useRef<HTMLDivElement>(null);
+  const ability = useAbility(); // Use ability context
+
+  const themeColors = {
+    background: theme === "dark" ? "#121212" : "#ffffff",
+    color: theme === "dark" ? "#ffffff" : "#000000",
+    scrollbarColor: theme === "dark" ? "#666666" : "#eaeaea", // Customize the scrollbar color
+  };
 
   const handleScroll = () => {
     const videoContainer = videoContainerRef.current;
@@ -69,46 +77,53 @@ const HomePage: React.FC = () => {
   }, [currentVideoIndex]);
 
   return (
-    <Layout style={{ background: theme === "dark" ? "#121212" : "#ffffff" }}>
-      <Content
-        ref={videoContainerRef}
-        style={{
-          height: "100vh",
-          overflowY: "scroll",
-          scrollSnapType: "y mandatory",
-          scrollbarWidth: "none",
-          msOverflowStyle: "none",
-          background: theme === "dark" ? "#121212" : "#ffffff",
-          color: theme === "dark" ? "#ffffff" : "#000000",
-        }}
-      >
-        <style jsx global>{`
-          .ant-layout-content::-webkit-scrollbar {
-            display: none;
-          }
-        `}</style>
-        {videos.map((video, index) => (
-          <div
-            key={index}
-            style={{
-              height: "100vh",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              scrollSnapAlign: "start",
-            }}
-          >
-            <ShortVideo
-              src={video.src}
-              poster={video.poster}
-              alt={video.alt}
-              videoInfo={video.videoInfo}
-              autoPlay={index === currentVideoIndex}
-            />
-          </div>
-        ))}
-      </Content>
-    </Layout>
+    <AbilityProvider role="user"> {/* Set the role dynamically or hardcoded for testing */}
+      <Layout style={{ background: themeColors.background }}>
+        <Content
+          ref={videoContainerRef}
+          style={{
+            height: "100vh",
+            overflowY: "scroll",
+            scrollSnapType: "y mandatory",
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+            background: themeColors.background,
+            color: themeColors.color,
+          }}
+        >
+          <style jsx global>{`
+            .ant-layout-content::-webkit-scrollbar {
+              display: none;
+            }
+            .ant-layout-content::-webkit-scrollbar-thumb {
+              background-color: ${themeColors.scrollbarColor};
+            }
+          `}</style>
+          {videos.map((video, index) => (
+            ability.can('read', 'ShortVideo') ? (
+              <div
+                key={index}
+                style={{
+                  height: "100vh",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  scrollSnapAlign: "start",
+                }}
+              >
+                <ShortVideo
+                  src={video.src}
+                  poster={video.poster}
+                  alt={video.alt}
+                  videoInfo={video.videoInfo}
+                  autoPlay={index === currentVideoIndex}
+                />
+              </div>
+            ) : null
+          ))}
+        </Content>
+      </Layout>
+    </AbilityProvider>
   );
 };
 

@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { useTheme } from "@/untils/ThemeContext";
+import { useTheme } from "@/app/context/ThemeContext";
 import Image from "next/image";
 
 const LoginCallback = () => {
