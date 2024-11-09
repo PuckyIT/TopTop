@@ -56,22 +56,23 @@ const ProfilePage: React.FC = () => {
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
-  }, []);  
+  }, []);
 
   useEffect(() => {
-    axiosInstance
-      .get(`/users/profile/${user.id}`)
-      .then((response) => {
-        setProfile(response.data);
-        setLoading(false);
-        setTempAvatar(response.data.avatar);
-      })
-      .catch((error) => {
-        message.error("Failed to load profile");
-        setLoading(false);
-      });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (user && user.id) {
+      axiosInstance
+        .get(`/users/profile/${user.id}`)
+        .then((response) => {
+          setProfile(response.data);
+          setLoading(false);
+          setTempAvatar(response.data.avatar);
+        })
+        .catch((error) => {
+          message.error("Failed to load profile");
+          setLoading(false);
+        });
+    }
+  }, [user]);
 
   const showModal = () => {
     if (profile) {
@@ -84,26 +85,6 @@ const ProfilePage: React.FC = () => {
     setIsModalVisible(true);
   };
 
-  const handleAvatarChange = async (info: any) => {
-    const file = info.file.originFileObj as File | undefined;
-
-    if (file) {
-      setAvatarFile(file); // Store the raw file for further processing.
-
-      try {
-        const base64 = await fileToBase64(file); // Convert file to base64
-        setTempAvatar(base64 as string); // Update your state with the base64 string
-      } catch (error) {
-        console.error("Error converting file to base64:", error);
-      }
-    }
-  };
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
-    setTempAvatar(undefined);
-  };
-
   const fileToBase64 = (file: File): Promise<string | ArrayBuffer | null> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -113,23 +94,46 @@ const ProfilePage: React.FC = () => {
     });
   };
 
+  const handleCancel = () => {
+    setIsModalVisible(false);
+    setTempAvatar(undefined);
+  };
+
+  // Cập nhật hàm handleAvatarChange để xử lý tệp avatar
+  const handleAvatarChange = async (info: any) => {
+    const file = info.file.originFileObj as File | undefined;
+
+    if (file) {
+      setAvatarFile(file); // Lưu file avatar gốc
+
+      try {
+        const base64 = await fileToBase64(file); // Chuyển đổi file sang base64 để hiển thị
+        setTempAvatar(base64 as string); // Cập nhật ảnh tạm thời
+      } catch (error) {
+        console.error("Error converting file to base64:", error);
+      }
+    }
+  };
+
+  // Hàm xử lý khi người dùng nhấn "Save"
   const handleOk = async () => {
-    setLoadingSave(true); // Start loading
+    setLoadingSave(true); // Bắt đầu quá trình lưu
+
     try {
       const values = await form.validateFields();
       const formData = new FormData();
       formData.append("username", values.username);
       formData.append("bio", values.bio);
 
-      // Only append the avatar file if it's selected
+      // Chỉ thêm avatar nếu người dùng đã chọn avatar mới
       if (avatarFile) {
-        formData.append("avatar", avatarFile as File);
+        formData.append("avatar", avatarFile); // Gửi tệp avatar thật sự thay vì uid
       }
 
-      // Make the API call to update the user profile
+      // Gửi yêu cầu cập nhật thông tin người dùng
       await axiosInstance.put(`/users/${user.id}`, formData);
 
-      // Optionally fetch the updated profile data
+      // Tải lại thông tin hồ sơ mới
       const updatedProfile = await axiosInstance.get(
         `/users/profile/${user.id}`
       );
@@ -139,7 +143,7 @@ const ProfilePage: React.FC = () => {
     } catch (error) {
       message.error("Failed to update profile");
     } finally {
-      setLoadingSave(false); // End loading
+      setLoadingSave(false); // Kết thúc quá trình lưu
     }
   };
 
@@ -276,26 +280,22 @@ const ProfilePage: React.FC = () => {
           >
             <Row justify="start" style={{ marginLeft: 10 }}>
               <Col>
-                <Upload
-                  showUploadList={false}
-                  onChange={handleAvatarChange}
+                <Avatar
+                  src={profile?.avatar || undefined}
+                  alt="User Avatar"
+                  className="avatar-user"
+                  onClick={showModal}
+                  style={{
+                    backgroundColor: "#ff204e",
+                    fontWeight: "bold",
+                    height: "212px",
+                    width: "212px",
+                    cursor: "pointer",
+                    fontSize: "96px",
+                  }}
                 >
-                  <Avatar
-                    src={profile?.avatar || undefined}
-                    alt="User Avatar"
-                    className="avatar-user"
-                    style={{
-                      backgroundColor: "#ff204e",
-                      fontWeight: "bold",
-                      height: "212px",
-                      width: "212px",
-                      cursor: "pointer",
-                      fontSize: "96px",
-                    }}
-                  >
-                    {!profile?.avatar && userInitials}
-                  </Avatar>
-                </Upload>
+                  {!profile?.avatar && userInitials}
+                </Avatar>
               </Col>
 
               <Col

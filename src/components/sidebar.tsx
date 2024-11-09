@@ -7,14 +7,18 @@ import {
   VideoCameraOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAbility } from "@/app/context/AbilityContext";
 
 const Sidebar = () => {
   const router = useRouter();
   const [selectedKey, setSelectedKey] = useState<string>("1");
-  const ability = useAbility();
+  const [userLoggedIn, setUserLoggedIn] = useState<boolean>(false);
+
+  useEffect(() => {
+    const user = localStorage.getItem("user");
+    setUserLoggedIn(!!user);
+  }, []);
 
   const handleMenuClick = (key: string) => {
     setSelectedKey(key);
@@ -32,9 +36,7 @@ const Sidebar = () => {
         router.push("/live");
         break;
       case "5":
-        if (ability.can("read", "Profile")) {
-          router.push("/profile");
-        }
+        router.push("/profile");
         break;
       default:
         break;
@@ -62,7 +64,7 @@ const Sidebar = () => {
       icon: <VideoCameraOutlined style={{ fontSize: "18px" }} />,
       label: "LIVE",
     },
-    ...(ability.can("read", "Profile")
+    ...(userLoggedIn
       ? [
           {
             key: "5",

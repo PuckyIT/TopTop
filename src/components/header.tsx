@@ -51,7 +51,7 @@ const HeaderComponent: React.FC = () => {
       localStorage.removeItem("user");
 
       // Optionally redirect the user or update the UI state
-      window.location.href = "/login"; // Redirect to login page
+      window.location.href = "/home"; // Redirect to login page
     } catch (error) {
       console.error("Logout failed:", error);
       message.error("Logout failed. Please try again.");
