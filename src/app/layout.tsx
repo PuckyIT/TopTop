@@ -17,8 +17,8 @@ export default function RootLayout({
   const userRole = "user"; // Replace with actual role logic if necessary
 
   return (
-    <html lang="en">
-      <ThemeProvider>
+    <ThemeProvider>
+      <html lang="en">
         <AbilityProvider role={userRole}>
           <body className={inter.className}>
             <AntdRegistry>
@@ -26,7 +26,7 @@ export default function RootLayout({
             </AntdRegistry>
           </body>
         </AbilityProvider>
-      </ThemeProvider>
-    </html>
+      </html>
+    </ThemeProvider>
   );
 }

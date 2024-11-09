@@ -1,12 +1,11 @@
 "use client";
+
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { useTheme } from "@/app/context/ThemeContext";
 import Image from "next/image";
 
 const LoginCallback = () => {
   const router = useRouter();
-  const { theme } = useTheme(); // Get the current theme
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -34,8 +33,6 @@ const LoginCallback = () => {
         justifyContent: "center",
         alignItems: "center",
         minHeight: "100vh",
-        backgroundColor: theme === "dark" ? "#121212" : "#ffffff",
-        color: theme === "dark" ? "#ffffff" : "#000000",
         flexDirection: "column",
       }}
     >
