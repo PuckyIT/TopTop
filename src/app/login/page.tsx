@@ -41,8 +41,9 @@ const LoginPage: React.FC = () => {
     try {
       const response = await axiosInstance.post("/auth/login", values);
       message.success("Đăng nhập thành công!");
-      localStorage.setItem("token", response.data.access_token);
+      localStorage.setItem("token", response.data.accessToken);
       localStorage.setItem("user", JSON.stringify(response.data.user));
+      localStorage.setItem("refreshToken", response.data.refreshToken);
       setLoading(false);
       router.push("/home");
     } catch (error) {
@@ -69,7 +70,7 @@ const LoginPage: React.FC = () => {
 
   const handleVerifyOtp = () => {
     setOtpLoading(true);
-    try{
+    try {
       message.success("OTP đã nhập!");
       setOtpModal(false);
       setResetPasswordModal(true);

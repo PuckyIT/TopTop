@@ -27,6 +27,8 @@ import {
   UploadOutlined,
 } from "@ant-design/icons";
 import { useTheme } from "../context/ThemeContext";
+import { useDispatch, useSelector } from "react-redux";
+import { setUser } from "../redux/userSlice";
 
 const { Title, Text } = Typography;
 
@@ -40,9 +42,10 @@ type ProfileData = {
 };
 
 const ProfilePage: React.FC = () => {
-  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const dispatch = useDispatch();
+  const user = useSelector((state: any) => state.user);
   const [loading, setLoading] = useState<boolean>(true);
-  const [user, setUser] = useState<any>(null);
+  const [dataLocal, setDataLocal] = useState<any>(null);
   const { theme } = useTheme();
   const [activeTab, setActiveTab] = useState("1");
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -54,16 +57,16 @@ const ProfilePage: React.FC = () => {
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      setDataLocal(JSON.parse(storedUser));
     }
   }, []);
 
   useEffect(() => {
-    if (user && user.id) {
+    if (dataLocal && dataLocal.id) {
       axiosInstance
-        .get(`/users/profile/${user.id}`)
+        .get(`/users/profile`)
         .then((response) => {
-          setProfile(response.data);
+          dispatch(setUser(response.data));
           setLoading(false);
           setTempAvatar(response.data.avatar);
         })
@@ -72,26 +75,17 @@ const ProfilePage: React.FC = () => {
           setLoading(false);
         });
     }
-  }, [user]);
+  }, [dispatch, dataLocal]);
 
   const showModal = () => {
-    if (profile) {
+    if (user) {
       form.setFieldsValue({
-        username: profile.username,
-        bio: profile.bio,
+        username: user.username,
+        bio: user.bio,
       });
     }
-    setTempAvatar(profile?.avatar);
+    setTempAvatar(user?.avatar);
     setIsModalVisible(true);
-  };
-
-  const fileToBase64 = (file: File): Promise<string | ArrayBuffer | null> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result); // Resolve with base64 string
-      reader.onerror = (error) => reject(error); // Handle error
-    });
   };
 
   const handleCancel = () => {
@@ -99,57 +93,69 @@ const ProfilePage: React.FC = () => {
     setTempAvatar(undefined);
   };
 
-  // Cập nhật hàm handleAvatarChange để xử lý tệp avatar
-  const handleAvatarChange = async (info: any) => {
-    const file = info.file.originFileObj as File | undefined;
-
+  const handleAvatarChange = (info: any) => {
+    const file = info.file.originFileObj as File;
     if (file) {
-      setAvatarFile(file); // Lưu file avatar gốc
-
-      try {
-        const base64 = await fileToBase64(file); // Chuyển đổi file sang base64 để hiển thị
-        setTempAvatar(base64 as string); // Cập nhật ảnh tạm thời
-      } catch (error) {
-        console.error("Error converting file to base64:", error);
-      }
+      setAvatarFile(file);
+      const reader = new FileReader();
+      reader.onload = () => setTempAvatar(reader.result as string);
+      reader.readAsDataURL(file);
     }
   };
 
-  // Hàm xử lý khi người dùng nhấn "Save"
   const handleOk = async () => {
-    setLoadingSave(true); // Bắt đầu quá trình lưu
-
+    setLoadingSave(true);
     try {
       const values = await form.validateFields();
       const formData = new FormData();
       formData.append("username", values.username);
       formData.append("bio", values.bio);
-
-      // Chỉ thêm avatar nếu người dùng đã chọn avatar mới
       if (avatarFile) {
-        formData.append("avatar", avatarFile); // Gửi tệp avatar thật sự thay vì uid
+        formData.append("avatar", avatarFile);
       }
 
-      // Gửi yêu cầu cập nhật thông tin người dùng
-      await axiosInstance.put(`/users/${user.id}`, formData);
-
-      // Tải lại thông tin hồ sơ mới
-      const updatedProfile = await axiosInstance.get(
-        `/users/profile/${user.id}`
+      // Make the API call to update the profile
+      const response = await axiosInstance.put(
+        `/users/profile/${dataLocal.id}`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
       );
-      setProfile(updatedProfile.data);
-      message.success("Profile updated successfully!");
+
+      // After a successful update, fetch the updated profile
+      axiosInstance
+        .get(`/users/profile`)
+        .then((res) => {
+          dispatch(setUser(res.data));
+          localStorage.setItem("user", JSON.stringify(res.data));
+          message.success("Profile updated successfully!");
+        })
+        .catch((error) => {
+          message.error("Failed to load updated profile");
+        });
+
       setIsModalVisible(false);
     } catch (error) {
       message.error("Failed to update profile");
     } finally {
-      setLoadingSave(false); // Kết thúc quá trình lưu
+      setLoadingSave(false);
     }
   };
 
   if (loading) {
     return <Skeleton active />;
   }
+
+  const themeColors = {
+    background: theme === "dark" ? "#121212" : "#ffffff",
+    color: theme === "dark" ? "#ffffff" : "#000000",
+    count: theme === "dark" ? "#8e8e93" : "#000000",
+    dividerColor: theme === "dark" ? "#333" : "#e0e0e0",
+    input: theme === "dark" ? "#333" : "#ffffff",
+    secondaryText:
+      theme === "dark" ? "rgba(255, 255, 255, 0.5)" : "rgba(98, 98, 98, 0.5)",
+  };
 
   const userInitials = user?.email
     ? user.email
@@ -183,7 +189,7 @@ const ProfilePage: React.FC = () => {
       children: (
         <Text
           style={{
-            color: theme === "dark" ? "#8e8e93" : "#ccc",
+            color: themeColors.secondaryText,
             display: "block",
             textAlign: "center",
             width: "80vw",
@@ -215,7 +221,7 @@ const ProfilePage: React.FC = () => {
       children: (
         <Text
           style={{
-            color: theme === "dark" ? "#8e8e93" : "#ccc",
+            color: themeColors.secondaryText,
             display: "block",
             textAlign: "center",
             width: "80vw",
@@ -247,7 +253,7 @@ const ProfilePage: React.FC = () => {
       children: (
         <Text
           style={{
-            color: theme === "dark" ? "#8e8e93" : "#ccc",
+            color: themeColors.secondaryText,
             display: "block",
             textAlign: "center",
             width: "80vw",
@@ -260,14 +266,14 @@ const ProfilePage: React.FC = () => {
   ];
 
   return (
-    <Layout style={{ background: theme === "dark" ? "#121212" : "#ffffff" }}>
+    <Layout style={{ background: themeColors.background }}>
       <Row
         justify="start"
         style={{
           padding: 0,
           minHeight: "100vh",
-          background: theme === "dark" ? "#121212" : "#ffffff",
-          color: theme === "dark" ? "#ffffff" : "#000000",
+          background: themeColors.background,
+          color: themeColors.color,
         }}
       >
         <Col xs={24} sm={16} md={12} lg={10}>
@@ -281,7 +287,7 @@ const ProfilePage: React.FC = () => {
             <Row justify="start" style={{ marginLeft: 10 }}>
               <Col>
                 <Avatar
-                  src={profile?.avatar || undefined}
+                  src={user?.avatar || undefined}
                   alt="User Avatar"
                   className="avatar-user"
                   onClick={showModal}
@@ -294,7 +300,7 @@ const ProfilePage: React.FC = () => {
                     fontSize: "96px",
                   }}
                 >
-                  {!profile?.avatar && userInitials}
+                  {!user?.avatar && userInitials}
                 </Avatar>
               </Col>
 
@@ -307,11 +313,8 @@ const ProfilePage: React.FC = () => {
                 }}
               >
                 <Row justify={"start"}>
-                  <Title
-                    level={3}
-                    style={{ color: theme === "dark" ? "#ffffff" : "#000000" }}
-                  >
-                    {profile?.username}
+                  <Title level={3} style={{ color: themeColors.color }}>
+                    {user?.username}
                   </Title>
                 </Row>
 
@@ -328,7 +331,7 @@ const ProfilePage: React.FC = () => {
                     icon={
                       <ShareAltOutlined
                         style={{
-                          color: theme === "dark" ? "#ffffff" : "#000000",
+                          color: themeColors.color,
                         }}
                       />
                     }
@@ -341,7 +344,7 @@ const ProfilePage: React.FC = () => {
                     icon={
                       <SettingOutlined
                         style={{
-                          color: theme === "dark" ? "#ffffff" : "#000000",
+                          color: themeColors.color,
                         }}
                       />
                     }
@@ -349,50 +352,41 @@ const ProfilePage: React.FC = () => {
                 </Row>
 
                 <Row style={{ marginBottom: "10px", display: "flex", gap: 10 }}>
-                  <Text
-                    strong
-                    style={{ color: theme === "dark" ? "#8e8e93" : "#000000" }}
-                  >
+                  <Text strong style={{ color: themeColors.count }}>
                     <Text
                       style={{
-                        color: theme === "dark" ? "#ffffff" : "#000000",
+                        color: themeColors.color,
                         marginRight: 5,
                         fontWeight: "bold",
                       }}
                     >
-                      {profile?.followingCount}
+                      {user?.followingCount}
                     </Text>
                     Following
                   </Text>
 
-                  <Text
-                    strong
-                    style={{ color: theme === "dark" ? "#8e8e93" : "#000000" }}
-                  >
+                  <Text strong style={{ color: themeColors.count }}>
                     <Text
                       style={{
-                        color: theme === "dark" ? "#ffffff" : "#000000",
+                        color: themeColors.color,
                         marginRight: 5,
                         fontWeight: "bold",
                       }}
                     >
-                      {profile?.followersCount}
+                      {user?.followersCount}
                     </Text>
                     Followers
                   </Text>
 
-                  <Text
-                    strong
-                    style={{ color: theme === "dark" ? "#8e8e93" : "#000000" }}
-                  >
+                  <Text strong style={{ color: themeColors.count }}>
                     <Text
                       style={{
-                        color: theme === "dark" ? "#ffffff" : "#000000",
+                        color: themeColors.color,
                         marginRight: 5,
                         fontWeight: "bold",
                       }}
                     >
-                      {profile?.likesCount}
+                      {user?.likesCount}
                     </Text>
                     Likes
                   </Text>
@@ -400,7 +394,7 @@ const ProfilePage: React.FC = () => {
 
                 <Row>
                   <Text type="secondary" style={{ color: "#8e8e93" }}>
-                    {profile?.bio || "No bio available"}
+                    {user?.bio || "No bio available"}
                   </Text>
                 </Row>
               </Col>
@@ -412,7 +406,7 @@ const ProfilePage: React.FC = () => {
               onChange={setActiveTab}
               items={items}
               tabBarStyle={{
-                color: theme === "dark" ? "#8e8e93" : "#000000",
+                color: themeColors.count,
                 borderBottom: "none",
                 width: "80vw",
                 marginTop: "5%",
@@ -455,22 +449,20 @@ const ProfilePage: React.FC = () => {
         <Form form={form} layout="vertical">
           <Title
             style={{
-              color: theme === "dark" ? "#fff" : "#000",
+              color: themeColors.color,
               fontSize: "24px",
             }}
           >
             Edit Profile
           </Title>
 
-          <Divider
-            style={{ backgroundColor: theme === "dark" ? "#333" : "#e0e0e0" }}
-          />
+          <Divider style={{ backgroundColor: themeColors.dividerColor }} />
           {/* Section 1: Profile Picture */}
           <div
             style={{
               alignSelf: "flex-start",
               marginBottom: "8px",
-              color: theme === "dark" ? "#fff" : "#000",
+              color: themeColors.color,
               fontWeight: "bold",
             }}
           >
@@ -499,7 +491,7 @@ const ProfilePage: React.FC = () => {
                   alignItems: "center",
                   border: "none",
                 }}
-                src={tempAvatar || profile?.avatar}
+                src={tempAvatar || user?.avatar || userInitials}
               />
               <div
                 style={{
@@ -509,7 +501,7 @@ const ProfilePage: React.FC = () => {
                   width: "40px",
                   height: "40px",
                   borderRadius: "50%",
-                  backgroundColor: theme === "dark" ? "#333" : "#fff",
+                  backgroundColor: themeColors.input,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -521,9 +513,7 @@ const ProfilePage: React.FC = () => {
             </Upload>
           </Form.Item>
 
-          <Divider
-            style={{ backgroundColor: theme === "dark" ? "#333" : "#e0e0e0" }}
-          />
+          <Divider style={{ backgroundColor: themeColors.dividerColor }} />
 
           {/* Section 2: Username */}
           <Form.Item
@@ -533,16 +523,14 @@ const ProfilePage: React.FC = () => {
           >
             <Input
               style={{
-                backgroundColor: theme === "dark" ? "#333" : "#fff",
-                color: theme === "dark" ? "#fff" : "#000",
+                backgroundColor: themeColors.input,
+                color: themeColors.color,
                 border: "none",
               }}
             />
           </Form.Item>
 
-          <Divider
-            style={{ backgroundColor: theme === "dark" ? "#333" : "#e0e0e0" }}
-          />
+          <Divider style={{ backgroundColor: themeColors.dividerColor }} />
 
           {/* Section 3: Bio */}
           <Form.Item name="bio" label="Bio">
@@ -551,16 +539,14 @@ const ProfilePage: React.FC = () => {
               maxLength={80}
               showCount
               style={{
-                backgroundColor: theme === "dark" ? "#333" : "#fff",
-                color: theme === "dark" ? "#fff" : "#000",
+                backgroundColor: themeColors.input,
+                color: themeColors.color,
                 border: "none",
               }}
             />
           </Form.Item>
 
-          <Divider
-            style={{ backgroundColor: theme === "dark" ? "#333" : "#e0e0e0" }}
-          />
+          <Divider style={{ backgroundColor: themeColors.dividerColor }} />
         </Form>
       </Modal>
     </Layout>

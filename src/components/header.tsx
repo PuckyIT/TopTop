@@ -25,23 +25,26 @@ import {
 } from "@ant-design/icons";
 import axiosInstance from "@/untils/axiosInstance";
 import Image from "next/image";
+import { useDispatch, useSelector } from "react-redux";
+import { setUser } from "@/app/redux/userSlice";
 
 const { Header } = Layout;
 
 const HeaderComponent: React.FC = () => {
+  const dispatch = useDispatch();
+  const user = useSelector((state: any) => state.user);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState<any>(null);
   const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      dispatch(setUser(JSON.parse(storedUser)));
       setIsLoggedIn(true);
     }
-  }, []);
-  
+  }, [dispatch]);
+
   const handleLogout = async () => {
     try {
       await axiosInstance.post("/auth/logout");
