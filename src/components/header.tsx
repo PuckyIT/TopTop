@@ -74,7 +74,7 @@ const HeaderComponent: React.FC = () => {
         .toUpperCase()
     : "U";
 
-  const menu = (
+  const menu: any = (
     <Menu
       style={{
         backgroundColor: theme === "dark" ? "#333333" : "#ffffff",
@@ -162,7 +162,7 @@ const HeaderComponent: React.FC = () => {
 
   return (
     <Header
-      className={theme === "dark" ? "dark-mode" : "light-mode"}
+      className='header-components'
       style={{
         background: theme === "light" ? "#ffffff" : "#121212",
         color: theme === "light" ? "#333" : "#f5f5f5",

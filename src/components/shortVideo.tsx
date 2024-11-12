@@ -37,6 +37,17 @@ const ShortVideo: React.FC<ShortVideoProps> = ({
   const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
   const [isVolumeHovered, setIsVolumeHovered] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect if the screen width is 450px or less
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 450);
+    handleResize(); // Check screen size on component mount
+    window.addEventListener("resize", handleResize);
+
+    // Clean up event listener on unmount
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -66,6 +77,41 @@ const ShortVideo: React.FC<ShortVideoProps> = ({
       setIsPlaying(!isPlaying);
     }
   };
+
+  // Sử dụng Intersection Observer API
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // Nếu video nằm trong viewport, phát tự động
+            video
+              .play()
+              .then(() => setIsPlaying(true))
+              .catch((error) => {
+                console.warn("Không thể phát tự động:", error);
+              });
+          } else {
+            // Nếu video ra khỏi viewport, dừng lại
+            video.pause();
+            setIsPlaying(false);
+          }
+        });
+      },
+      {
+        threshold: 0.5, // 50% video nằm trong viewport thì kích hoạt
+      }
+    );
+
+    observer.observe(video);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   const handleSeek = (event: React.MouseEvent<HTMLDivElement>) => {
     if (videoRef.current && duration) {
@@ -105,13 +151,6 @@ const ShortVideo: React.FC<ShortVideoProps> = ({
 
   const info = videoInfo || defaultVideoInfo;
 
-  useEffect(() => {
-    if (videoRef.current) {
-      if (autoPlay) videoRef.current.play();
-      else videoRef.current.pause();
-    }
-  }, [autoPlay]);
-
   return (
     <div
       className="video-container"
@@ -138,7 +177,6 @@ const ShortVideo: React.FC<ShortVideoProps> = ({
           marginTop: "20%",
         }}
       />
-
       <div
         className="video-info"
         style={{
@@ -153,47 +191,18 @@ const ShortVideo: React.FC<ShortVideoProps> = ({
         <h3 style={{ margin: 0 }}>{info.uploader}</h3>
         <p style={{ margin: "5px 0" }}>{info.title}</p>
       </div>
-
-      <div
-        className="video-controls"
-        style={{
-          width: "90%",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          position: "absolute",
-          bottom: isHovered ? "5%" : "-10%",
-          left: "5%",
-          transition: "bottom 0.3s ease-in-out",
-        }}
-      >
-        <Button
-          type="link"
-          style={{
-            color: "rgba(255,255,255,0.9)",
-            fontSize: "20px",
-            padding: 3,
-          }}
-          icon={
-            isPlaying ? (
-              <FontAwesomeIcon icon={faPause} />
-            ) : (
-              <FontAwesomeIcon icon={faPlay} />
-            )
-          }
-          onClick={handlePlayPause}
-        />
-
+      {isMobile ? (
         <div
-          className="progress-bar"
+          className="simple-progress-bar"
           onMouseDown={handleSeek}
           style={{
-            width: "70%",
+            width: "90%",
             height: "5px",
             backgroundColor: "rgba(255,255,255,0.2)",
-            position: "relative",
+            position: "absolute",
+            bottom: "0",
+            left: "5%",
             cursor: "pointer",
-            margin: "10px 0",
             borderRadius: "8px",
             overflow: "hidden",
           }}
@@ -203,54 +212,118 @@ const ShortVideo: React.FC<ShortVideoProps> = ({
             style={{
               height: "100%",
               width: `${(currentTime / duration) * 100}%`,
-              backgroundColor: "rgba(255,255,255,0.9)",
+              backgroundColor: "rgba(255,255,255,0.6)",
               position: "absolute",
               top: 0,
               left: 0,
             }}
           />
         </div>
-
+      ) : (
         <div
-          className="volume-container"
-          onMouseEnter={() => setIsVolumeHovered(true)}
-          onMouseLeave={() => setIsVolumeHovered(false)}
-          style={{ position: "relative", cursor: "pointer", paddingLeft: 10 }}
+          className="video-controls"
+          style={{
+            width: "90%",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            position: "absolute",
+            bottom: isHovered ? "5%" : "-10%",
+            left: "5%",
+            transition: "bottom 0.3s ease-in-out",
+          }}
         >
-          <FontAwesomeIcon
-            icon={isMuted ? faVolumeMute : faVolumeUp}
-            onClick={toggleMute}
-            style={{ color: "rgba(255,255,255,0.9)", fontSize: "20px" }}
+          <Button
+            type="link"
+            style={{
+              color: "rgba(255,255,255,0.9)",
+              fontSize: "20px",
+              padding: 3,
+            }}
+            icon={
+              isPlaying ? (
+                <FontAwesomeIcon icon={faPause} />
+              ) : (
+                <FontAwesomeIcon icon={faPlay} />
+              )
+            }
+            onClick={handlePlayPause}
           />
 
-          {isVolumeHovered && (
+          <div
+            className="progress-bar"
+            onMouseDown={handleSeek}
+            style={{
+              width: "70%",
+              height: "5px",
+              backgroundColor: "rgba(255,255,255,0.2)",
+              position: "relative",
+              cursor: "pointer",
+              margin: "10px 0",
+              borderRadius: "8px",
+              overflow: "hidden",
+            }}
+          >
             <div
-              className="volume-bar"
-              onMouseDown={handleVolumeChange}
+              className="progress"
               style={{
+                height: "100%",
+                width: `${(currentTime / duration) * 100}%`,
+                backgroundColor: "rgba(255,255,255,0.9)",
                 position: "absolute",
-                bottom: "30px",
-                left: "50%",
-                width: "7px",
-                height: "70px",
-                backgroundColor: "rgba(255,255,255,0.2)",
-                borderRadius: "8px",
-                cursor: "pointer",
+                top: 0,
+                left: 0,
               }}
-            >
+            />
+          </div>
+
+          <div
+            className="volume-container"
+            onMouseEnter={() => setIsVolumeHovered(true)}
+            onMouseLeave={() => setIsVolumeHovered(false)}
+            style={{ position: "relative", cursor: "pointer", paddingLeft: 10 }}
+          >
+            <FontAwesomeIcon
+              icon={isMuted ? faVolumeMute : faVolumeUp}
+              onClick={toggleMute}
+              style={{
+                color: "rgba(255,255,255,0.9)",
+                fontSize: "20px",
+                padding: "0 5%",
+              }}
+            />
+
+            {isVolumeHovered && (
               <div
-                className="volume-progress"
+                className="volume-bar"
+                onMouseDown={handleVolumeChange}
                 style={{
-                  width: "100%",
-                  height: `${volume * 100}%`,
-                  backgroundColor: "rgba(255,255,255,0.9)",
+                  position: "absolute",
+                  bottom: "20px",
+                  left: "65%",
+                  width: "7px",
+                  height: "70px",
+                  backgroundColor: "rgba(255,255,255,0.2)", // Đây là màu nền của volume-bar
                   borderRadius: "8px",
+                  cursor: "pointer",
+                  transform: "translateX(-50%) rotate(180deg)", // Xoay thanh âm lượng 180 độ
                 }}
-              />
-            </div>
-          )}
+              >
+                <div
+                  className="volume-progress"
+                  style={{
+                    width: "100%",
+                    height: `${volume * 100}%`, // Điều chỉnh chiều cao theo volume
+                    backgroundColor: "rgba(255,255,255,0.9)", // Đảm bảo màu trắng sáng cho thanh tiến độ
+                    borderRadius: "8px",
+                    bottom: 0,
+                  }}
+                />
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

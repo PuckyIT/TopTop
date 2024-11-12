@@ -18,7 +18,7 @@ axiosInstance.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    console.log("Interceptor config:", config); 
+    console.log("Interceptor config:", config);
     return config;
   },
   (error) => {
@@ -38,30 +38,36 @@ axiosInstance.interceptors.response.use(
       originalRequest._retry = true;
 
       const refreshToken = localStorage.getItem('refreshToken');
-      if (refreshToken) {
-        try {
-          // Gửi yêu cầu refresh token
-          const { data } = await axios.post('http://localhost:8080/api/v1/auth/refresh-token', {
-            refreshToken,
-          });
 
-          // Lưu token mới vào localStorage
-          const newAccessToken = data.access_token;
-          localStorage.setItem('token', newAccessToken);
+      // Kiểm tra nếu không có refreshToken
+      if (!refreshToken) {
+        message.error('No refresh token found. Please log in.');
+        router.push('/login');
+        return Promise.reject(error); // Ngừng thực hiện tiếp yêu cầu
+      }
 
-          // Cập nhật header Authorization với token mới
-          originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+      try {
+        // Gửi yêu cầu refresh token
+        const { data } = await axios.post('http://localhost:8080/api/v1/auth/refresh-token', {
+          refreshToken,
+        });
 
-          // Thực hiện lại yêu cầu ban đầu với token mới
-          return axiosInstance(originalRequest);
-        } catch (err) {
-          // Nếu refresh token thất bại (ví dụ: refresh token hết hạn), yêu cầu người dùng đăng nhập lại
-          message.error('Session expired. Please log in again.');
-          localStorage.removeItem('token');
-          localStorage.removeItem('refreshToken');
-          router.push('/login');
-          return Promise.reject(err);
-        }
+        // Lưu token mới vào localStorage
+        const newAccessToken = data.access_token;
+        localStorage.setItem('token', newAccessToken);
+
+        // Cập nhật header Authorization với token mới
+        originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+
+        // Thực hiện lại yêu cầu ban đầu với token mới
+        return axiosInstance(originalRequest);
+      } catch (err) {
+        // Nếu refresh token thất bại (ví dụ: refresh token hết hạn), yêu cầu người dùng đăng nhập lại
+        message.error('Session expired. Please log in again.');
+        localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
+        router.push('/login');
+        return Promise.reject(err);
       }
     }
 

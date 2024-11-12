@@ -73,13 +73,14 @@ const HomePage: React.FC = () => {
         videoContainer.removeEventListener("scroll", handleScroll);
       }
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentVideoIndex]);
 
   return (
-    <AbilityProvider role="user"> {/* Set the role dynamically or hardcoded for testing */}
-      <Layout style={{ background: themeColors.background }}>
+    <AbilityProvider role="user">
+      <Layout className='layout' style={{ background: themeColors.background }}>
         <Content
+          className="home-content"
           ref={videoContainerRef}
           style={{
             height: "100vh",
@@ -99,8 +100,8 @@ const HomePage: React.FC = () => {
               background-color: ${themeColors.scrollbarColor};
             }
           `}</style>
-          {videos.map((video, index) => (
-            ability.can('read', 'ShortVideo') ? (
+          {videos.map((video, index) =>
+            ability.can("read", "ShortVideo") ? (
               <div
                 key={index}
                 style={{
@@ -120,7 +121,7 @@ const HomePage: React.FC = () => {
                 />
               </div>
             ) : null
-          ))}
+          )}
         </Content>
       </Layout>
     </AbilityProvider>

@@ -51,6 +51,7 @@ const Signup: React.FC = () => {
 
   return (
     <div
+      className="signup-page"
       style={{
         display: "flex",
         justifyContent: "center",
@@ -65,6 +66,7 @@ const Signup: React.FC = () => {
       }}
     >
       <Form
+        className="signup-form"
         name="signup"
         onFinish={handleSubmit}
         style={{

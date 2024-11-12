@@ -1,7 +1,7 @@
 // pages/login.tsx
 
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Form, Input, Button, message, Modal, theme } from "antd";
 import { useRouter } from "next/navigation";
 import axiosInstance from "@/untils/axiosInstance";
@@ -9,6 +9,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useTheme } from "@/app/context/ThemeContext";
 import { EyeInvisibleOutlined, EyeOutlined } from "@ant-design/icons";
+import "@/app/globals.css";
 
 const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -61,8 +62,12 @@ const LoginPage: React.FC = () => {
       message.success("OTP đã được gửi đến email của bạn!");
       setForgotPasswordModal(false);
       setOtpModal(true);
-    } catch (error) {
-      message.error("Không thể gửi OTP. Vui lòng thử lại.");
+    } catch (error: any) {
+      if (error.response && error.response.status === 409) {
+        message.error("OTP đã gửi. Vui lòng kiểm tra mail.");
+      } else {
+        message.error("Không thể gửi OTP. Vui lòng thử lại.");
+      }
     } finally {
       setForgotPasswordLoading(false);
     }
@@ -108,6 +113,7 @@ const LoginPage: React.FC = () => {
 
   return (
     <div
+      className="login-page"
       style={{
         display: "flex",
         justifyContent: "center",
@@ -119,14 +125,16 @@ const LoginPage: React.FC = () => {
             : "linear-gradient(135deg, #f8f8ff, #e9efff)",
         color: themeColors.color,
         fontWeight: "bold",
+        padding: "10px",
       }}
     >
       <Form
         name="login"
+        className="login-form"
         onFinish={onFinish}
         style={{
-          width: 500,
           display: "flex",
+          width: "35vw",
           flexDirection: "column",
           backgroundColor: themeColors.background,
           color: themeColors.color,
@@ -312,15 +320,39 @@ const LoginPage: React.FC = () => {
       </Form>
 
       <Modal
-        title="Quên mật khẩu"
+        title={
+          <div
+            style={{
+              fontWeight: "bold",
+              textAlign: "center",
+              width: "100%",
+              color: themeColors.color,
+            }}
+          >
+            Quên mật khẩu
+          </div>
+        }
         open={forgotPasswordModal}
+        className="forgot-password-modal"
         onOk={handleForgotPassword}
         onCancel={() => setForgotPasswordModal(false)}
         confirmLoading={forgotPasswordLoading}
         okText="Xác nhận"
         cancelText="Hủy"
-        style={{ top: "25%", textAlign: "center", fontWeight: "bold" }}
         width={500}
+        centered
+        bodyStyle={{
+          padding: 0,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          textAlign: "center",
+          borderRadius: "8px", // Thêm borderRadius
+        }}
+        style={{
+          borderRadius: "8px", // Áp dụng borderRadius cho Modal chính
+          overflow: "hidden", // Đảm bảo phần viền không bị cắt
+        }}
         cancelButtonProps={{
           style: {
             color: themeColors.color,
@@ -329,32 +361,62 @@ const LoginPage: React.FC = () => {
           },
         }}
       >
-        <Form.Item
-          label="Email"
-          rules={[{ required: true, message: "Vui lòng nhập email!" }]}
-        >
-          <Input
-            value={forgotEmail}
-            onChange={(e) => setForgotEmail(e.target.value)}
-            placeholder="Nhập email của bạn"
-            style={{
-              color: themeColors.color,
-              background: themeColors.inputBg,
-            }}
-          />
-        </Form.Item>
+        <Form layout="vertical" style={{ width: "100%", padding: "16px" }}>
+          <Form.Item
+            className="forgot-password-form"
+            label={
+              <span style={{ color: themeColors.color, fontWeight: "bold" }}>
+                Email
+              </span>
+            }
+            rules={[{ required: true, message: "Vui lòng nhập email!" }]}
+          >
+            <Input
+              value={forgotEmail}
+              onChange={(e) => setForgotEmail(e.target.value)}
+              placeholder="Nhập email của bạn"
+              style={{
+                color: themeColors.color,
+                background: themeColors.inputBg,
+              }}
+            />
+          </Form.Item>
+        </Form>
       </Modal>
 
       <Modal
-        title="Nhập OTP"
+        title={
+          <div
+            style={{
+              fontWeight: "bold",
+              textAlign: "center",
+              width: "100%",
+              color: themeColors.color,
+            }}
+          >
+            Nhập OTP
+          </div>
+        }
         open={otpModal}
         onOk={handleVerifyOtp}
         onCancel={() => setOtpModal(false)}
         okText="Xác nhận"
         cancelText="Hủy"
+        className="otp-modal"
         confirmLoading={otpLoading}
-        style={{ top: "25%", textAlign: "center", fontWeight: "bold" }}
         width={500}
+        centered
+        bodyStyle={{
+          padding: 0,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          borderRadius: "8px",
+        }}
+        style={{
+          borderRadius: "8px",
+          overflow: "hidden",
+        }}
         cancelButtonProps={{
           style: {
             color: themeColors.color,
@@ -364,13 +426,24 @@ const LoginPage: React.FC = () => {
         }}
       >
         <Form.Item
-          label="OTP"
+          className="otp-form"
+          label={
+            <span
+              style={{
+                color: themeColors.color,
+                fontWeight: "bold",
+                flex: 1,
+              }}
+            >
+              OTP
+            </span>
+          }
           rules={[{ required: true, message: "Vui lòng nhập OTP!" }]}
         >
           <Input
             value={otp}
             onChange={(e) => setOtp(e.target.value)}
-            placeholder="Nhập OTP đã gửi đến email"
+            placeholder="Nhập OTP"
             style={{
               color: themeColors.color,
               background: themeColors.inputBg,
@@ -380,15 +453,38 @@ const LoginPage: React.FC = () => {
       </Modal>
 
       <Modal
-        title="Đặt lại mật khẩu"
+        title={
+          <div
+            style={{
+              fontWeight: "bold",
+              textAlign: "center",
+              width: "100%",
+              color: themeColors.color,
+            }}
+          >
+            Đặt lại mật khẩu
+          </div>
+        }
         open={resetPasswordModal}
         onOk={handleResetPassword}
         onCancel={() => setResetPasswordModal(false)}
         okText="Xác nhận"
         cancelText="Hủy"
+        className="reset-password-modal"
         confirmLoading={resetPasswordLoading}
-        style={{ top: "25%", textAlign: "center", fontWeight: "bold" }}
         width={500}
+        centered
+        bodyStyle={{
+          padding: "16px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          borderRadius: "8px",
+        }}
+        style={{
+          borderRadius: "8px",
+          overflow: "hidden",
+        }}
         cancelButtonProps={{
           style: {
             color: themeColors.color,
@@ -397,9 +493,14 @@ const LoginPage: React.FC = () => {
           },
         }}
       >
-        <Form layout="vertical">
+        <Form layout="vertical" style={{ width: "100%" }}>
           <Form.Item
-            label="Mật khẩu mới"
+            className="reset-password-form"
+            label={
+              <span style={{ color: themeColors.color, fontWeight: "bold" }}>
+                Mật khẩu mới
+              </span>
+            }
             name="newPassword"
             rules={[
               {
@@ -427,7 +528,11 @@ const LoginPage: React.FC = () => {
             />
           </Form.Item>
           <Form.Item
-            label="Xác nhận mật khẩu mới"
+            label={
+              <span style={{ color: themeColors.color, fontWeight: "bold" }}>
+                Xác nhận mật khẩu mới
+              </span>
+            }
             name="confirmPassword"
             rules={[
               {
