@@ -19,7 +19,21 @@ type User = {
 };
 
 // Khởi tạo state ban đầu là null
-const initialState: User | null = null;
+const initialState = {
+  _id: '',
+  email: '',
+  password: '',
+  role: '',
+  isActive: false,
+  createdAt: '',
+  updatedAt: '',
+  bio: '',
+  followersCount: 0,
+  followingCount: 0,
+  likesCount: 0,
+  avatar: '',
+  username: '',
+};
 
 // Tạo slice cho người dùng
 const userSlice = createSlice({
@@ -28,11 +42,29 @@ const userSlice = createSlice({
   reducers: {
     // Cập nhật thông tin người dùng
     setUser(state, action: PayloadAction<User>) {
-      return action.payload; // Trả về thông tin người dùng từ payload
+      if (state) {
+        Object.assign(state, action.payload); // Cập nhật trực tiếp state
+      } else {
+        return action.payload; // Thiết lập state mới khi state hiện tại là null
+      }
     },
     // Xóa thông tin người dùng
     clearUser() {
-      return null; // Xóa người dùng
+      return {
+        _id: '',
+        email: '',
+        password: '',
+        role: '',
+        isActive: false,
+        createdAt: '',
+        updatedAt: '',
+        bio: '',
+        followersCount: 0,
+        followingCount: 0,
+        likesCount: 0,
+        avatar: '',
+        username: '',
+      }; // Xóa người dùng
     },
   },
 });

@@ -175,7 +175,6 @@ body {
 }
 
 .ant-tabs-ink-bar {
-  position: absolute !important;
   background: var(--ink-bar-color) !important;
   pointer-events: none !important;
 }
@@ -236,6 +235,9 @@ body {
   justify-content: center;
   width: 100vw;
 }
+.ant-menu-horizontal > .ant-menu-item::after {
+  display: none !important;
+}
 /* -----------------------------------------------Responsive-----------------------------------------------*/
 
 /* Media Query for Small Screens */
@@ -265,7 +267,7 @@ body {
   .reset-password-form {
     height: 400 !important;
   }
-  .home-content{
+  .home-content {
     background-color: #000000 !important;
   }
   .video-container {
@@ -299,4 +301,11 @@ body {
   #sidebar {
     display: none !important;
   }
+
+  .profile-tabs {
+    width: 100vw !important;
+  }
+
+  /* Căn chỉnh profile card */
+  
 }

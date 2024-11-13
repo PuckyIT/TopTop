@@ -32,7 +32,7 @@ import { setUser } from "../redux/userSlice";
 
 const { Title, Text } = Typography;
 
-const ProfilePage: React.FC = () => {
+const ProfileMobile: React.FC = () => {
   const dispatch = useDispatch();
   const user = useSelector((state: any) => state.user);
   const [loading, setLoading] = useState<boolean>(true);
@@ -64,7 +64,7 @@ const ProfilePage: React.FC = () => {
           setLoading(false);
         });
     } else {
-      setLoading(false); // Ensure loading stops if no user found
+      setLoading(false);
     }
   }, [dispatch]);  
 
@@ -107,7 +107,7 @@ const ProfilePage: React.FC = () => {
       }
 
       // Make the API call to update the profile
-      await axiosInstance.put(
+      const response = await axiosInstance.put(
         `/users/profile/${dataLocal.id}`,
         formData,
         {
@@ -546,4 +546,4 @@ const ProfilePage: React.FC = () => {
   );
 };
 
-export default ProfilePage;
+export default ProfileMobile;

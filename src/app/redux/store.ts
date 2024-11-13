@@ -3,10 +3,8 @@ import { configureStore } from "@reduxjs/toolkit";
 import userReducer from "./userSlice";
 
 // Tạo store Redux và kết nối reducer
-const store = configureStore({
+export const store = configureStore({
   reducer: {
-    user: userReducer, // user reducer sẽ quản lý thông tin người dùng
+    user: userReducer,
   },
 });
-
-export default store;

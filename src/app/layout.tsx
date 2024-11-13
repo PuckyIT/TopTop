@@ -7,7 +7,7 @@ import ClientOnlyLayout from "@/components/clientOnlyLayout";
 import { ThemeProvider } from "@/app/context/ThemeContext";
 import { AbilityProvider } from "./context/AbilityContext";
 import { Provider } from "react-redux";
-import store from "./redux/store";
+import { store } from "./redux/store";
 
 const inter = Inter({ subsets: ["latin"] });
 

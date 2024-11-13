@@ -41,7 +41,7 @@ const SidebarMobile: React.FC = () => {
         router.push("/messages");
         break;
       case "4":
-        router.push("/profile");
+        router.push("/profile-mobile");
         break;
       default:
         break;
