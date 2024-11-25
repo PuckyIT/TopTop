@@ -59,15 +59,10 @@ const Sidebar = () => {
       icon: <TeamOutlined style={{ fontSize: "18px" }} />,
       label: "Following",
     },
-    {
-      key: "4",
-      icon: <VideoCameraOutlined style={{ fontSize: "18px" }} />,
-      label: "LIVE",
-    },
     ...(userLoggedIn
       ? [
           {
-            key: "5",
+            key: "4",
             icon: <UserOutlined style={{ fontSize: "18px" }} />,
             label: "Profile",
           },

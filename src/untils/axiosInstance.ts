@@ -4,8 +4,10 @@ import { message } from 'antd';
 
 // Tạo một instance của axios với cấu hình cơ bản
 const axiosInstance = axios.create({
+  
   // baseURL: 'https://toptop-be.onrender.com/api/v1',
-  baseURL: 'http://localhost:8080/api/v1',
+  // baseURL: 'http://localhost:8080/api/v1',
+  baseURL: 'https://top-top-be-puckyit-puckyits-projects.vercel.app',
   headers: {
     'Content-Type': 'application/json',
   },
