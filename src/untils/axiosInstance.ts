@@ -1,6 +1,6 @@
+
 import axios from 'axios';
 import { message } from 'antd';
-import { useRouter } from 'next/router';
 
 // Tạo một instance của axios với cấu hình cơ bản
 const axiosInstance = axios.create({
@@ -18,7 +18,6 @@ axiosInstance.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    console.log("Interceptor config:", config);
     return config;
   },
   (error) => {
@@ -31,18 +30,15 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    const router = useRouter(); // Sử dụng router để chuyển hướng
 
     // Nếu token hết hạn (lỗi 401)
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-
       const refreshToken = localStorage.getItem('refreshToken');
 
       // Kiểm tra nếu không có refreshToken
       if (!refreshToken) {
         message.error('No refresh token found. Please log in.');
-        router.push('/login');
         return Promise.reject(error); // Ngừng thực hiện tiếp yêu cầu
       }
 
@@ -66,7 +62,6 @@ axiosInstance.interceptors.response.use(
         message.error('Session expired. Please log in again.');
         localStorage.removeItem('token');
         localStorage.removeItem('refreshToken');
-        router.push('/login');
         return Promise.reject(err);
       }
     }

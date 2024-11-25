@@ -35,7 +35,7 @@ const Signup: React.FC = () => {
 
     setLoading(true);
     try {
-      const response = await axiosInstance.post("/users/signup", {
+      await axiosInstance.post("/auth/signup", {
         email,
         username,
         password,

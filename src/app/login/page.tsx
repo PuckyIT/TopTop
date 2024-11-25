@@ -1,8 +1,8 @@
 // pages/login.tsx
 
 "use client";
-import { useEffect, useState } from "react";
-import { Form, Input, Button, message, Modal, theme } from "antd";
+import { useState } from "react";
+import { Form, Input, Button, message, Modal } from "antd";
 import { useRouter } from "next/navigation";
 import axiosInstance from "@/untils/axiosInstance";
 import Link from "next/link";
@@ -56,7 +56,7 @@ const LoginPage: React.FC = () => {
   const handleForgotPassword = async () => {
     setForgotPasswordLoading(true);
     try {
-      await axiosInstance.post("/users/forgot-password", {
+      await axiosInstance.post("/auth/forgot-password", {
         email: forgotEmail,
       });
       message.success("OTP đã được gửi đến email của bạn!");
@@ -91,7 +91,7 @@ const LoginPage: React.FC = () => {
       return;
     }
     try {
-      await axiosInstance.post(`/users/reset-password/${otp}`, {
+      await axiosInstance.post(`/auth/reset-password/${otp}`, {
         email: forgotEmail,
         newPassword: newPassword,
       });
@@ -135,6 +135,7 @@ const LoginPage: React.FC = () => {
         style={{
           display: "flex",
           width: "35vw",
+          maxHeight: "80vh",
           flexDirection: "column",
           backgroundColor: themeColors.background,
           color: themeColors.color,

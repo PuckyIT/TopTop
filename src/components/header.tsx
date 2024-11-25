@@ -27,6 +27,7 @@ import axiosInstance from "@/untils/axiosInstance";
 import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "@/app/redux/userSlice";
+import UploadVideoButton from "@/components/UploadVideoButton";
 
 const { Header } = Layout;
 
@@ -137,32 +138,9 @@ const HeaderComponent: React.FC = () => {
     </Menu>
   );
 
-  const handleVideoUpload = async (file: File) => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      message.error("You need to log in to upload a video.");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("video", file);
-
-    try {
-      await axiosInstance.post("/videos/upload", formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      message.success("Video uploaded successfully!");
-    } catch (error) {
-      message.error("Failed to upload video.");
-    }
-  };
-
   return (
     <Header
-      className='header-components'
+      className="header-components"
       style={{
         background: theme === "light" ? "#ffffff" : "#121212",
         color: theme === "light" ? "#333" : "#f5f5f5",
@@ -263,21 +241,7 @@ const HeaderComponent: React.FC = () => {
       >
         {isLoggedIn ? (
           <div style={{ display: "flex", alignItems: "center" }}>
-            <Upload
-              showUploadList={false}
-              beforeUpload={(file) => {
-                handleVideoUpload(file);
-                return false; // Prevent auto upload
-              }}
-            >
-              <Button
-                type="default"
-                className="custom-btn"
-                icon={<UploadOutlined />}
-              >
-                Upload
-              </Button>
-            </Upload>
+            <UploadVideoButton />
             <Link href="/profile">
               <Avatar
                 src={user?.avatar || undefined}
