@@ -15,9 +15,12 @@ type ThongTinVideo = {
 
 type ShortVideoProps = {
   src: string;
-  poster: string;
-  alt: string;
-  videoInfo?: ThongTinVideo;
+  poster?: string;
+  alt?: string;
+  videoInfo?: {
+    uploader: string;
+    title: string;
+  };
   autoPlay?: boolean;
 };
 
@@ -170,6 +173,7 @@ const ShortVideo: React.FC<ShortVideoProps> = ({
         loop
         playsInline
         onClick={handlePlayPause}
+        onError={() => console.error("Failed to load video:", src)}
         style={{
           width: "100%",
           height: "90%",

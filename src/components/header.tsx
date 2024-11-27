@@ -5,10 +5,8 @@ import {
   Input,
   Button,
   Avatar,
-  Dropdown,
-  Menu,
-  Upload,
   message,
+  MenuProps,
 } from "antd";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -20,7 +18,6 @@ import {
   QuestionCircleOutlined,
   TranslationOutlined,
   MoonOutlined,
-  UploadOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
 import axiosInstance from "@/untils/axiosInstance";
@@ -28,6 +25,7 @@ import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "@/app/redux/userSlice";
 import UploadVideoButton from "@/components/UploadVideoButton";
+import CustomDropdown from "./DropdownBtn";
 
 const { Header } = Layout;
 
@@ -75,68 +73,35 @@ const HeaderComponent: React.FC = () => {
         .toUpperCase()
     : "U";
 
-  const menu: any = (
-    <Menu
-      style={{
-        backgroundColor: theme === "dark" ? "#333333" : "#ffffff",
-        borderRadius: "8px",
-        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-      }}
-    >
-      <Menu.Item
-        key="creator"
-        icon={<HomeOutlined />}
-        style={{
-          color: theme === "dark" ? "#f5f5f5" : "#333333",
-          padding: "8px 16px",
-        }}
-      >
-        Công cụ dành cho nhà sáng tạo
-      </Menu.Item>
-      <Menu.Item
-        key="language"
-        icon={<TranslationOutlined />}
-        style={{
-          color: theme === "dark" ? "#f5f5f5" : "#333333",
-          padding: "8px 16px",
-        }}
-      >
-        Tiếng Việt
-      </Menu.Item>
-      <Menu.Item
-        key="support"
-        icon={<QuestionCircleOutlined />}
-        style={{
-          color: theme === "dark" ? "#f5f5f5" : "#333333",
-          padding: "8px 16px",
-        }}
-      >
-        Phản hồi và trợ giúp
-      </Menu.Item>
-      <Menu.Item
-        key="theme"
-        icon={<MoonOutlined />}
-        style={{
-          color: theme === "dark" ? "#f5f5f5" : "#333333",
-          padding: "8px 16px",
-        }}
-        onClick={toggleTheme}
-      >
-        {theme === "light" ? "Chế độ tối" : "Chế độ sáng"}
-      </Menu.Item>
-      <Menu.Item
-        key="logout"
-        icon={<LogoutOutlined />}
-        style={{
-          color: theme === "dark" ? "#f5f5f5" : "#333333",
-          padding: "8px 16px",
-        }}
-        onClick={handleLogout}
-      >
-        Log out
-      </Menu.Item>
-    </Menu>
-  );
+    const menuItems = [
+      {
+        key: "creator",
+        label: "Công cụ dành cho nhà sáng tạo",
+        icon: <HomeOutlined />,
+      },
+      {
+        key: "language",
+        label: "Tiếng Việt",
+        icon: <TranslationOutlined />,
+      },
+      {
+        key: "support",
+        label: "Phản hồi và trợ giúp",
+        icon: <QuestionCircleOutlined />,
+      },
+      {
+        key: "theme",
+        label: theme === "light" ? "Chế độ tối" : "Chế độ sáng",
+        icon: <MoonOutlined />,
+        onClick: toggleTheme,
+      },
+      {
+        key: "logout",
+        label: "Log out",
+        icon: <LogoutOutlined />,
+        onClick: handleLogout,
+      },
+    ];
 
   return (
     <Header
@@ -275,22 +240,7 @@ const HeaderComponent: React.FC = () => {
             </Button>
           </Link>
         )}
-        <Dropdown
-          overlay={menu}
-          trigger={["hover"]}
-          overlayStyle={{
-            marginTop: "10px",
-            borderRadius: "8px",
-          }}
-        >
-          <MoreOutlined
-            style={{
-              fontSize: "24px",
-              cursor: "pointer",
-              color: theme === "light" ? "#333333" : "#f5f5f5",
-            }}
-          />
-        </Dropdown>
+        <CustomDropdown items={menuItems} />
       </div>
     </Header>
   );

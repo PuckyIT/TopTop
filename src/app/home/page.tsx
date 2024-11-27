@@ -54,8 +54,17 @@ const HomePage: React.FC = () => {
   const fetchUserVideos = async () => {
     try {
       const response = await axiosInstance.get(`/videos/all`);
-      console.log("Data", response.data);
-      return response.data;
+      // Map URLs to Video objects
+      const videoData = response.data.videoUrls.map((url: string) => ({
+        src: url,
+        poster: "", // Thêm giá trị mặc định nếu không có poster
+        alt: "Video preview", // Giá trị mặc định cho alt
+        videoInfo: {
+          uploader: "Unknown uploader",
+          title: "Untitled video",
+        },
+      }));
+      return videoData;
     } catch (error) {
       console.error("Error fetching videos:", error);
       throw error;
@@ -67,8 +76,8 @@ const HomePage: React.FC = () => {
     const loadVideos = async () => {
       try {
         setLoading(true);
-        const userVideos = await fetchUserVideos();
-        setVideos(userVideos.videoUrls);
+        const userVideos = await fetchUserVideos(); // Lấy videoData trả về
+        setVideos(userVideos); // Gán mảng videoData trực tiếp
         setError(null);
       } catch (error: any) {
         setError(
@@ -163,10 +172,15 @@ const HomePage: React.FC = () => {
                   }}
                 >
                   <ShortVideo
-                    src={videos as unknown as string}
-                    poster={video.poster}
-                    alt={video.alt}
-                    videoInfo={video.videoInfo}
+                    src={video.src} // Sửa lại: truyền đúng video URL
+                    poster={video.poster || ""} // Nếu không có poster, truyền giá trị mặc định
+                    alt={video.alt || "Video preview"} // Tương tự cho alt
+                    videoInfo={
+                      video.videoInfo || {
+                        uploader: "Unknown",
+                        title: "No title",
+                      }
+                    }
                     autoPlay={index === currentVideoIndex}
                   />
                 </div>
